@@ -1,7 +1,7 @@
 Wav.Net
 =======
 
-Is a fully featured .Net library<sup>§</sup> for reading and writing to `.wav` (wave) files.
+Is a fully featured .Net library<sup>§</sup> for transcoding (reading, writing & creating) `.wav` (wave) files.
 
 Current support:
 
