@@ -392,9 +392,12 @@ namespace WavDotNet.Core
 		}
 
 		private void WriteMetaData()
-		{	
-			var ieeeGuid = new byte[] { 0, 0, 0, 3, 0, 0, 0, 16, 128, 0, 0, 170, 0, 56, 155, 113 };
-			var pcmGuid = new byte[] { 0, 0, 0, 1, 0, 0, 0, 16, 128, 0, 0, 170, 0, 56, 155, 113 };
+		{	// \x00\x00\x00\x00\x10\x00\x80\x00\x00\xAA\x00\x38\x9B\x71
+			var guid = new List<byte>(BitConverter.GetBytes((ushort)Format));
+			guid.AddRange(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71});
+
+			//var ieeeGuid = new byte[] { 0, 0, 0, 3, 0, 0, 0, 16, 128, 0, 0, 170, 0, 56, 155, 113 };
+			//var pcmGuid = new byte[] { 0, 0, 0, 1, 0, 0, 0, 16, 128, 0, 0, 170, 0, 56, 155, 113 };
 			var isMono = AudioData[0].Position == ChannelPositions.Mono;
 
 			stream.Position = 0;
@@ -449,7 +452,7 @@ namespace WavDotNet.Core
 				stream.Write(BitConverter.GetBytes(GetSpeakerMask()), 0, 4);
 
 				// GUID + Format. Format is either PCM or floating point. Anyother format indicates compression.
-				stream.Write(Format == WavFormat.FloatingPoint ? ieeeGuid : pcmGuid, 0, 16);
+				stream.Write(guid.ToArray(), 0, 16);
 			}
 
 

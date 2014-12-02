@@ -68,7 +68,6 @@
     <Compile Include="Tools\Generators\WhiteNoise.cs" />
     <Compile Include="Tools\PhaseShifter.cs" />
     <Compile Include="Tools\SampleInverter.cs" />
-    <Compile Include="Tools\SilenceTrimmer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="keyfile.pfx" />
