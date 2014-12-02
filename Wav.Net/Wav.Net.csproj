@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{05BB732F-9A16-4C82-A293-9D7144997242}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WavDotNet</RootNamespace>
+    <AssemblyName>Wav.Net</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>none</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>keyfile.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\Channel.cs" />
+    <Compile Include="Core\ChannelPosition.cs" />
+    <Compile Include="Core\Exceptions.cs" />
+    <Compile Include="Core\SampleConverter.AlgoManager.cs" />
+    <Compile Include="Core\SampleConverter.cs" />
+    <Compile Include="Core\SampleReader.cs" />
+    <Compile Include="Core\Samples.cs" />
+    <Compile Include="Core\WavFile.cs" />
+    <Compile Include="Core\WavFileRead.cs" />
+    <Compile Include="Core\WavFileWrite.cs" />
+    <Compile Include="Core\WavFormat.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\DecibelCalculator.cs" />
+    <Compile Include="Tools\Filters\BesselLowPass.cs" />
+    <Compile Include="Tools\Filters\LinkwitzRileyHighPass.cs" />
+    <Compile Include="Tools\Filters\LinkwitzRileyLowPass.cs" />
+    <Compile Include="Tools\Generators\Rain.cs" />
+    <Compile Include="Tools\Generators\Sawtooth.cs" />
+    <Compile Include="Tools\Generators\SineWave.cs" />
+    <Compile Include="Tools\Generators\SquareWave.cs" />
+    <Compile Include="Tools\Generators\WhiteNoise.cs" />
+    <Compile Include="Tools\PhaseShifter.cs" />
+    <Compile Include="Tools\SampleInverter.cs" />
+    <Compile Include="Tools\SilenceTrimmer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="keyfile.pfx" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
