@@ -1,7 +1,7 @@
 Wav.Net
 =======
 
-Is a fully featured .Net library<sup>ง</sup> for reading and writing to `.wav` (wave) files.
+Is a fully featured .Net library<sup>ยง</sup> for reading and writing to `.wav` (wave) files.
 
 Current support:
 
@@ -10,4 +10,6 @@ Current support:
  - Channels: 19,
  - Audio format: PCM and IEEE floating-point.
  
- <sup>ง *Requires .Net 2.0 or higher.*</sup>
+---
+
+ <sup>ยง *Requires .Net 2.0 or higher.*</sup>
