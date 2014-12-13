@@ -1,13 +1,9 @@
-﻿using System;
-
-
-
-namespace WavDotNet.Core
+﻿namespace WavDotNet.Core
 {
-	public enum WavFormat
-	{
-		Unknown = 0,
-		Pcm = 1,
-		FloatingPoint = 3
-	}
+    public enum WavFormat
+    {
+        Unknown = 0,
+        Pcm = 1,
+        FloatingPoint = 3
+    }
 }
