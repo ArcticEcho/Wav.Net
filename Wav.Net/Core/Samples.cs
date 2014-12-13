@@ -1,4 +1,30 @@
-﻿using System;
+﻿/*
+ * 
+ * 
+ * Wav.Net. A .Net 2.0 based library for transcoding ".wav" (wave) files.
+ * Copyright © 2014, ArcticEcho.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * 
+ */
+
+
+
+
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -65,6 +91,22 @@ namespace WavDotNet.Core
 
 
 
+        public Samples(T[] samples)
+        {
+            if (samples == null) { throw new ArgumentNullException("samples"); }
+
+            var inTypeName = typeof(T).FullName;
+
+            if (!Regex.IsMatch(inTypeName, @"^System\.(U?Int\d{1,2}|S?Byte|Single|Double|Decimal)$", RegexOptions.CultureInvariant))
+            {
+                throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
+            }
+
+            getCount = () => samples.Length;
+            sampleGetter = i => samples[i];
+            sampleSetter = (i, val) => samples[i] = val;
+        }
+
         public Samples(IList<T> samples)
         {
             if (samples == null) { throw new ArgumentNullException("samples"); }
@@ -78,6 +120,9 @@ namespace WavDotNet.Core
 
             getCount = () => samples.Count;
             sampleGetter = i => samples[i];
+            sampleSetter = (i, val) => samples[i] = val;
+            sampleAdder = samples.Add;
+            sampleRemover = samples.RemoveAt;
         }
 
         public Samples(IList<T> samples, bool isReadOnly)

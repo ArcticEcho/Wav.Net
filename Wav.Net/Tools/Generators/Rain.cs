@@ -1,5 +1,32 @@
-﻿using System;
+﻿/*
+ * 
+ * 
+ * Wav.Net. A .Net 2.0 based library for transcoding ".wav" (wave) files.
+ * Copyright © 2014, ArcticEcho.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * 
+ */
+
+
+
+
+
+using System;
 using WavDotNet.Core;
+using WavDotNet.Tools.Filters;
 
 
 
@@ -19,9 +46,11 @@ namespace WavDotNet.Tools.Generators
         private double hpfCutoffFreq;
         private double maxOscillationsPerDrop;
         private int maxDropFreq;
+        private LinkwitzRileyLowPass lowPass;
+        private LinkwitzRileyHighPass highPass;
 
         /// <summary>
-        /// The foreground rain intensity percentage (1 = 100%, 0.5 = 50%, etc.). Default: 
+        /// The foreground rain intensity percentage (1 = 100%, 0.5 = 50%, etc.). Default: 0.05.
         /// </summary>
         public double ForegroundRainIntensity
         {
@@ -39,7 +68,7 @@ namespace WavDotNet.Tools.Generators
         }
 
         /// <summary>
-        /// The background rain intensity percentage (1 = 100%, 0.5 = 50%, etc.).
+        /// The background rain intensity percentage (1 = 100%, 0.5 = 50%, etc.). Default: 0.3.
         /// </summary>
         public double BackgroundRainIntensity
         {
@@ -57,7 +86,7 @@ namespace WavDotNet.Tools.Generators
         }
 
         /// <summary>
-        /// The minimum permitted frequency of a rain drop.
+        /// The minimum (inclusive) permitted frequency of a rain drop. Default: 3500.
         /// </summary>
         public int MinDropFreq
         {
@@ -75,7 +104,7 @@ namespace WavDotNet.Tools.Generators
         }
 
         /// <summary>
-        /// The maximum permitted frequency of a rain drop.
+        /// The maximum (exclusive) permitted frequency of a rain drop. Default: 120001.
         /// </summary>
         public int MaxDropFreq
         {
@@ -93,7 +122,7 @@ namespace WavDotNet.Tools.Generators
         }
 
         /// <summary>
-        /// The exclusive maximum number of samples per drop.
+        /// The maximum (exclusive) number of samples per drop. Default: 5.
         /// </summary>
         public double MaxOscillationsPerDrop
         {
@@ -111,7 +140,7 @@ namespace WavDotNet.Tools.Generators
         }
 
         /// <summary>
-        /// The highpass filter (HPF) cutoff frequency.
+        /// The highpass filter (HPF) cutoff frequency. Default: 250.
         /// </summary>
         public double HpfCutoffFreq
         {
@@ -129,7 +158,7 @@ namespace WavDotNet.Tools.Generators
         }
 
         /// <summary>
-        /// The lowpass filter (LPF) cutoff frequency.
+        /// The lowpass filter (LPF) cutoff frequency. Default: 13000.
         /// </summary>
         public double LpfCuttoffFreq
         {
@@ -161,6 +190,9 @@ namespace WavDotNet.Tools.Generators
             MaxOscillationsPerDrop = 5;
             HpfCutoffFreq = 250;
             LpfCuttoffFreq = 13000;
+
+            lowPass = new LinkwitzRileyLowPass((uint)sampleRate);
+            highPass = new LinkwitzRileyHighPass((uint)sampleRate);
         }
 
 
@@ -232,7 +264,7 @@ namespace WavDotNet.Tools.Generators
                 }
             }
 
-            return new Samples<double>(LinkwitzRileyLowPass(LinkwitzRileyHighPass(samples, HpfCutoffFreq), LpfCuttoffFreq));
+            return new Samples<double>(lowPass.Apply(highPass.Apply(samples, HpfCutoffFreq), LpfCuttoffFreq));
         }
 
 
