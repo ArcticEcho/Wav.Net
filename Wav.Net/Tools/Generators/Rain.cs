@@ -264,7 +264,7 @@ namespace WavDotNet.Tools.Generators
                 }
             }
 
-            return new Samples<double>(lowPass.Apply(highPass.Apply(samples, HpfCutoffFreq), LpfCuttoffFreq));
+            return lowPass.Apply(highPass.Apply(new Samples<double>(samples), HpfCutoffFreq), LpfCuttoffFreq);
         }
 
 
