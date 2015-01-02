@@ -50,7 +50,7 @@ namespace WavDotNet.Tools.Generators
         {
             if (amplitude < 0 || amplitude > 1) { throw new ArgumentOutOfRangeException("amplitude", "Amplitude must be between 0 and 1."); }
 
-            var samples = new float[(int)duration.TotalSeconds * sampleRate];
+            var samples = new float[(int)(duration.TotalSeconds * sampleRate)];
             var r = new Random();
 
             for (var i = 0; i < samples.Length; i++)
@@ -65,7 +65,7 @@ namespace WavDotNet.Tools.Generators
         {
             if (amplitude < 0 || amplitude > 1) { throw new ArgumentOutOfRangeException("amplitude", "Amplitude must be between 0 and 1."); }
 
-            var samples = new double[(int)duration.TotalSeconds * sampleRate];
+            var samples = new double[(int)(duration.TotalSeconds * sampleRate)];
             var r = new Random();
 
             for (var i = 0; i < samples.Length; i++)

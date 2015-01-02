@@ -51,7 +51,7 @@ namespace WavDotNet.Tools.Generators
             if (amplitude < 0 || amplitude > 1) { throw new ArgumentOutOfRangeException("amplitude", "Amplitude must be between 0 and 1."); }
             if (frequency == 0) { throw new ArgumentOutOfRangeException("frequency", "Frequency must be more than 0."); }
 
-            var samples = new float[(int)duration.TotalSeconds * sampleRate];
+            var samples = new float[(int)(duration.TotalSeconds * sampleRate)];
             var freq = sampleRate / frequency;
             var ii = -1f;
             var k = 2f / freq;
@@ -75,7 +75,7 @@ namespace WavDotNet.Tools.Generators
             if (amplitude < 0 || amplitude > 1) { throw new ArgumentOutOfRangeException("amplitude", "Amplitude must be between 0 and 1."); }
             if (frequency == 0) { throw new ArgumentOutOfRangeException("frequency", "Frequency must be more than 0."); }
 
-            var samples = new double[(int)duration.TotalSeconds * sampleRate];
+            var samples = new double[(int)(duration.TotalSeconds * sampleRate)];
             var freq = sampleRate / frequency;
             var ii = -1.0;
             var k = 2.0 / freq;
