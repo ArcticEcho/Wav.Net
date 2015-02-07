@@ -1,0 +1,2 @@
+language: csharp
+solution: ./Wav.Net/Wav.Net.sln
