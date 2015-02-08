@@ -8,7 +8,7 @@ Audio support:
  - Bit depth: 8 to 64-bits,
  - Sample rate: 1 to 4,294,967,296Hz,
  - Audio format: PCM and IEEE floating-point,
- - Supports `Stream`? Yep,
+ - Supports `Stream`s? Yep,
  - Max channels: 19,
  - Max file size: 2GiB.
 
