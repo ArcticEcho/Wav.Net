@@ -49,6 +49,7 @@
     <Compile Include="Core\Channel.cs" />
     <Compile Include="Core\ChannelPosition.cs" />
     <Compile Include="Core\Exceptions.cs" />
+    <Compile Include="Core\IoPriority.cs" />
     <Compile Include="Core\SampleConverter.AlgoManager.cs" />
     <Compile Include="Core\SampleConverter.cs" />
     <Compile Include="Core\SampleReader.cs" />
