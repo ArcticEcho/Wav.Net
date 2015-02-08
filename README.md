@@ -1,15 +1,26 @@
 Wav.Net [![Build Status](https://travis-ci.org/ArcticEcho/Wav.Net.svg?branch=master)](https://travis-ci.org/ArcticEcho/Wav.Net)
 =======
 
-Is a fully featured .Net library<sup>§</sup> for transcoding (reading, writing & creating) `.wav` (wave) files.
+Wav.Net is a fully featured .Net library<sup>§</sup> for transcoding wave files (reading, writing/creating, etc.).
 
-Current support:
+Audio support:
 
  - Bit depth: 8 to 64-bits,
  - Sample rate: 1 to 4,294,967,296Hz,
- - Channels: 19,
- - Audio format: PCM and IEEE floating-point.
+ - Audio format: PCM and IEEE floating-point,
+ - Supports `Stream`? Yep,
+ - Max channels: 19,
+ - Max file size: 2GiB.
+
+Current features:
+
+ - Tone generators: Sine, sawtooth, square, white noise & rain,
+ - Low pass filters: Linkwitz Riley & Bessel,
+ - High pass filter: Linkwitz Riley,
+ - Phase shifter,
+ - Decibel/amplitude calculator,
+ - Sample inverter.
  
 ---
 
- <sup>§ *Requires .Net 2.0 or higher.*</sup>
+ <sup>§ *Requires .Net 2.0 or higher, and yes, it's Mono compatible.*</sup>
