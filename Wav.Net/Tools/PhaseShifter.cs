@@ -1,6 +1,4 @@
 ﻿/*
- * 
- * 
  * Wav.Net. A .Net 2.0 based library for transcoding ".wav" (wave) files.
  * Copyright © 2014, ArcticEcho.
  *
@@ -16,18 +14,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
  */
-
-
 
 
 
 using System;
 using WavDotNet.Core;
-
-
 
 namespace WavDotNet.Tools
 {
@@ -77,7 +69,6 @@ namespace WavDotNet.Tools
                 lx4 = ly3;
 
                 // Final output.
-
                 newSamples[i] = ly4;
 
                 wp *= sweepfac;            // Adjust freq of filters.
@@ -129,7 +120,6 @@ namespace WavDotNet.Tools
                 lx4 = ly3;
 
                 // Final output.
-
                 newSamples[i] = ly4;
 
                 wp *= sweepfac;            // Adjust freq of filters.

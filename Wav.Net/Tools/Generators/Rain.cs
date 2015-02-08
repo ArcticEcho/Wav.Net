@@ -1,6 +1,4 @@
 ﻿/*
- * 
- * 
  * Wav.Net. A .Net 2.0 based library for transcoding ".wav" (wave) files.
  * Copyright © 2014, ArcticEcho.
  *
@@ -16,19 +14,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
  */
-
-
 
 
 
 using System;
 using WavDotNet.Core;
 using WavDotNet.Tools.Filters;
-
-
 
 namespace WavDotNet.Tools.Generators
 {
@@ -223,7 +215,7 @@ namespace WavDotNet.Tools.Generators
                     // Pick the drop's frequency.
                     dropFreq = r.Next(MinDropFreq, MaxDropFreq);
 
-                    // Calc how many samples each oscillation of the drop will be for the specified frequency (i.e., sample count of a sinlge oscillation).
+                    // Calc how many samples each oscillation of the drop will be for the specified frequency (i.e., sample count of a single oscillation).
                     var samplesPerOscillation = sampleRate / dropFreq;
 
                     // Calc the drop's total sample count.
@@ -272,110 +264,6 @@ namespace WavDotNet.Tools.Generators
         private double GetBackgroundNoise(int i, int freq)
         {
             return (Math.Sin(((Math.PI * 2 * freq) / (sampleRate + r.Next(-(int)(sampleRate * 0.01), (int)(sampleRate * 0.01)))) * i) * 0.5) + (r.NextDouble() * 0.5);
-        }
-
-        private double[] LinkwitzRileyLowPass(double[] samples, double cutoff)
-        {
-            if (cutoff < 1 || cutoff >= sampleRate / 2) { throw new ArgumentOutOfRangeException("cutoff", "The cutoff frequency must be between 0 and 'sampleRate' / 2."); }
-            if (samples == null || samples.Length == 0) { throw new ArgumentException("'samples' can not be null or empty.", "samples"); }
-
-            var newSamples = new double[samples.Length];
-            var wc = 2 * Math.PI * cutoff;
-            var wc2 = wc * wc;
-            var wc3 = wc2 * wc;
-            var wc4 = wc2 * wc2;
-            var k = wc / Math.Tan(Math.PI * cutoff / sampleRate);
-            var k2 = k * k;
-            var k3 = k2 * k;
-            var k4 = k2 * k2;
-            var sqrt2 = Math.Sqrt(2);
-            var sqTmp1 = sqrt2 * wc3 * k;
-            var sqTmp2 = sqrt2 * wc * k3;
-            var aTmp = 4 * wc2 * k2 + 2 * sqTmp1 + k4 + 2 * sqTmp2 + wc4;
-
-            var b1 = (4 * (wc4 + sqTmp1 - k4 - sqTmp2)) / aTmp;
-            var b2 = (6 * wc4 - 8 * wc2 * k2 + 6 * k4) / aTmp;
-            var b3 = (4 * (wc4 - sqTmp1 + sqTmp2 - k4)) / aTmp;
-            var b4 = (k4 - 2 * sqTmp1 + wc4 - 2 * sqTmp2 + 4 * wc2 * k2) / aTmp;
-
-            var a0 = wc4 / aTmp;
-            var a1 = 4 * wc4 / aTmp;
-            var a2 = 6 * wc4 / aTmp;
-            var a3 = a1;
-            var a4 = a0;
-
-            double ym1 = 0.0, ym2 = 0.0, ym3 = 0.0, ym4 = 0.0, xm1 = 0.0, xm2 = 0.0, xm3 = 0.0, xm4 = 0.0, tempy;
-
-            for (var i = 0; i < samples.Length; i++)
-            {
-                var tempx = samples[i];
-
-                tempy = a0 * tempx + a1 * xm1 + a2 * xm2 + a3 * xm3 + a4 * xm4 - b1 * ym1 - b2 * ym2 - b3 * ym3 - b4 * ym4;
-                xm4 = xm3;
-                xm3 = xm2;
-                xm2 = xm1;
-                xm1 = tempx;
-                ym4 = ym3;
-                ym3 = ym2;
-                ym2 = ym1;
-                ym1 = tempy;
-
-                newSamples[i] = tempy;
-            }
-
-            return newSamples;
-        }
-
-        private double[] LinkwitzRileyHighPass(double[] samples, double cutoff)
-        {
-            if (cutoff < 1 || cutoff >= sampleRate / 2) { throw new ArgumentOutOfRangeException("cutoff", "The cutoff frequency must be between 0 and 'sampleRate' / 2."); }
-            if (samples == null || samples.Length == 0) { throw new ArgumentException("'samples' can not be null or empty.", "samples"); }
-
-            var newSamples = new double[samples.Length];
-            var wc = 2 * Math.PI * cutoff;
-            var wc2 = wc * wc;
-            var wc3 = wc2 * wc;
-            var wc4 = wc2 * wc2;
-            var k = wc / Math.Tan(Math.PI * cutoff / sampleRate);
-            var k2 = k * k;
-            var k3 = k2 * k;
-            var k4 = k2 * k2;
-            var sqrt2 = Math.Sqrt(2);
-            var sqTmp1 = sqrt2 * wc3 * k;
-            var sqTmp2 = sqrt2 * wc * k3;
-            var aTmp = 4 * wc2 * k2 + 2 * sqTmp1 + k4 + 2 * sqTmp2 + wc4;
-
-            var b1 = (4 * (wc4 + sqTmp1 - k4 - sqTmp2)) / aTmp;
-            var b2 = (6 * wc4 - 8 * wc2 * k2 + 6 * k4) / aTmp;
-            var b3 = (4 * (wc4 - sqTmp1 + sqTmp2 - k4)) / aTmp;
-            var b4 = (k4 - 2 * sqTmp1 + wc4 - 2 * sqTmp2 + 4 * wc2 * k2) / aTmp;
-
-            var a0 = k4 / aTmp;
-            var a1 = -4 * k4 / aTmp;
-            var a2 = 6 * k4 / aTmp;
-            var a3 = a1;
-            var a4 = a0;
-
-            double ym1 = 0.0, ym2 = 0.0, ym3 = 0.0, ym4 = 0.0, xm1 = 0.0, xm2 = 0.0, xm3 = 0.0, xm4 = 0.0, tempy;
-
-            for (var i = 0; i < samples.Length; i++)
-            {
-                var tempx = samples[i];
-
-                tempy = a0 * tempx + a1 * xm1 + a2 * xm2 + a3 * xm3 + a4 * xm4 - b1 * ym1 - b2 * ym2 - b3 * ym3 - b4 * ym4;
-                xm4 = xm3;
-                xm3 = xm2;
-                xm2 = xm1;
-                xm1 = tempx;
-                ym4 = ym3;
-                ym3 = ym2;
-                ym2 = ym1;
-                ym1 = tempy;
-
-                newSamples[i] = tempy;
-            }
-
-            return newSamples;
         }
     }
 }

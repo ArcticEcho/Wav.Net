@@ -1,6 +1,4 @@
 ﻿/*
- * 
- * 
  * Wav.Net. A .Net 2.0 based library for transcoding ".wav" (wave) files.
  * Copyright © 2014, ArcticEcho.
  *
@@ -16,11 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
  */
-
-
 
 
 
@@ -30,8 +24,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-
-
 
 namespace WavDotNet.Core
 {
@@ -58,6 +50,9 @@ namespace WavDotNet.Core
             }
         }
 
+        /// <summary>
+        /// Returns a sample at the specified index.
+        /// </summary>
         public T this[uint index]
         {
             get
@@ -78,12 +73,17 @@ namespace WavDotNet.Core
             }
         }
 
+        /// <summary>
+        /// Returns a range of samples from the specified indexes.
+        /// </summary>
+        /// <param name="startIndex">The index at which to start reading samples.</param>
+        /// <param name="endIndex">The index at which to finish reading samples.</param>
         public Samples<T> this[uint startIndex, uint endIndex]
         {
             get
             {
-                if (startIndex > endIndex) { throw new IndexOutOfRangeException("'startIndex' can not be more than 'endIndex'."); }
-                if (endIndex > SampleCount) { throw new IndexOutOfRangeException(); }
+                if (startIndex > endIndex) { throw new IndexOutOfRangeException("'startIndex' must not be more than 'endIndex'."); }
+                if (endIndex > SampleCount) { throw new IndexOutOfRangeException("'endIndex' must not be more than 'SampleCount'."); }
 
                 var count = endIndex - startIndex;
 
@@ -109,6 +109,8 @@ namespace WavDotNet.Core
         }
 
 
+
+        # region Constructors/destructor.
 
         public SampleReader(string filePath, ChannelPositions channel, uint? bufferCapacity)
         {
@@ -145,7 +147,7 @@ namespace WavDotNet.Core
 
             bufferCapacity = 1048576;
             buffer = new Dictionary<uint, T>();
-            UpdateBuffer(0);			
+            UpdateBuffer(0);
         }
 
         public SampleReader(Stream stream, ChannelPositions channel, uint? bufferCapacity)
@@ -193,8 +195,12 @@ namespace WavDotNet.Core
             }
         }
 
+        # endregion
 
 
+        /// <summary>
+        /// Reads all samples from the stream/file.
+        /// </summary>
         public Samples<T> LoadAllSamples()
         {
             return ReadAudioData(0, SampleCount);
@@ -213,9 +219,7 @@ namespace WavDotNet.Core
             if (disposed) { return; }
 
             stream.Dispose();
-
-            GC.SuppressFinalize(this);			
-
+            GC.SuppressFinalize(this);
             disposed = true;
         }
 
@@ -239,9 +243,7 @@ namespace WavDotNet.Core
             buffer.Clear();
 
             var trueByteDepth = (audioFormat == WavFormat.FloatingPoint ? Math.Max((ushort)32, bitDepth) : bitDepth) / 8;
-
             var endIndex = Math.Max((uint)(bufferCapacity / trueByteDepth) + sampleIndex, SampleCount);
-
             var samples = LoadSamples(sampleIndex, endIndex);
 
             for (uint i = 0; i < samples.Count; i++)
@@ -250,12 +252,13 @@ namespace WavDotNet.Core
             }
         }
 
+        # region Private meta reading methods.
+
         private void GetMeta()
         {
             var bytes = new byte[1024];
 
             stream.Position = 0;
-
             stream.Read(bytes, 0, 1024);
 
             var streamLength = (int)stream.Length;
@@ -288,11 +291,8 @@ namespace WavDotNet.Core
         private void CheckMeta()
         {
             if (bitDepth == 0) { throw new UnrecognisedWavFileException("File is displaying an invalid bit depth."); }
-
             if (channels == 0) { throw new UnrecognisedWavFileException("File is displaying an invalid number of channels."); }
-
             if (audioFormat == WavFormat.Unknown) { throw new UnrecognisedWavFileException("Can only read audio in either PCM or IEEE format."); }
-
             if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
             {
                 throw new UnrecognisedWavFileException("File is of an unsupported bit depth of:" + bitDepth + ".\nSupported bit depths: 8, 16, 24, 32, 64 and 128.");
@@ -326,6 +326,10 @@ namespace WavDotNet.Core
             return mask;
         }
 
+        # endregion
+
+        # region Private sample reading methods.
+
         private Samples<T> ReadAudioData(uint startIndex, uint endIndex)
         {
             switch (bitDepth)
@@ -355,11 +359,6 @@ namespace WavDotNet.Core
                     return Read64BitSamples(startIndex, endIndex);
                 }
 
-                //case 128:
-                //{
-                //	return Read128BitSamples(startIndex, endIndex);
-                //}
-
                 default:
                 {
                     throw new NotSupportedException("Can not read audio at bit depth of: " + bitDepth);
@@ -371,7 +370,6 @@ namespace WavDotNet.Core
         {
             int length;
             var bytes = ReadBytes(sampleStartIndex, sampleEndIndex, out length);
-
             var samples = new byte[length];
 
             for (var i = 0; i < length; i++)
@@ -494,82 +492,39 @@ namespace WavDotNet.Core
             }
         }
 
-        //TODO: Look-up how to read 128 bit samples.
-        //private Samples<T> Read128BitSamples(uint sampleStartIndex, uint sampleEndIndex)
-        //{
-        //	var bytesLength = (sampleEndIndex * 16) - (sampleStartIndex * 16);
-        //	var bytes = new byte[bytesLength];
-        //	var tempSamples = new decimal[bytesLength / 16];
+        # endregion
 
-        //	ReadBytes(sampleStartIndex, sampleEndIndex, bytes);
-
-        //	unsafe
-        //	{
-        //		for (var i = 0; i < bytesLength; i += 16)
-        //		{
-        //			var bin = new[]
-        //			{
-        //				bytes[i     ] | bytes[i +  1] << 8 | bytes[i +  2] << 16 | bytes[i +  3] << 32,
-        //				bytes[i +  4] | bytes[i +  5] << 8 | bytes[i +  6] << 16 | bytes[i +  7] << 32,
-        //				bytes[i +  8] | bytes[i +  9] << 8 | bytes[i + 10] << 16 | bytes[i + 11] << 32,
-        //				bytes[i + 12] | bytes[i + 13] << 8 | bytes[i + 14] << 16 | bytes[i + 15] << 32
-        //			};
-
-        //			//var temp = bin1 | bin2 << 32 | bin3 << 64 | bin4 << 128; // Or +?
-
-        //			var sample = 0m;
-
-        //			for (var k = 0; k < 128; k += 32)
-        //			{
-        //				var temp = bin[k / 32];
-
-        //				for (var j = 0; j < k; j++)
-        //				{
-        //					temp *= temp;
-        //				}
-
-        //				sample += temp;
-        //			}
-
-        //			tempSamples[i / 16] = sample;
-        //		}
-        //	}
-            
-        //	var realSamples = SampleConverter<decimal, T>.Convert(tempSamples).ToArray();
-
-        //	return new Samples<T>(() => realSamples.Length, i => realSamples[i]);
-        //}
+        # region Private byte reading methods.
 
         private unsafe byte* ReadBytes(uint sampleStartIndex, uint sampleEndIndex, out int byteCount)
         {
-            var ch = GetChannelNumber(Channel, FindExistingChannels(speakerMask));
+            var chNo = GetChannelNumber(Channel, FindExistingChannels(speakerMask));
             var byteDepth = bitDepth / 8;
-            var chDelta = ch * byteDepth;
+            var chDelta = chNo * byteDepth;
             var frameSize = byteDepth * channels;
-            var a = (int)(sampleStartIndex * byteDepth * channels);
-            var b = (int)(sampleEndIndex * byteDepth * channels);
-            var outputBytesCount = b - a;
+            var startDelta = (int)(sampleStartIndex * byteDepth * channels);
+            var endDelta = (int)(sampleEndIndex * byteDepth * channels);
+            var outputBytesCount = endDelta - startDelta;
             var temp = new byte[outputBytesCount];
-            //var outputBytes = new byte[outputBytesCount];
             var ptr = (byte*)Marshal.AllocHGlobal(outputBytesCount);
             var i = 0;
 
-            stream.Position = headerSize + a;
+            stream.Position = headerSize + startDelta;
             stream.Read(temp, 0, outputBytesCount);
 
-            a += chDelta;
+            startDelta += chDelta;
 
-            for (var j = a; j < b; j += frameSize)
+            for (var j = startDelta; j < endDelta; j += frameSize)
             {
                 for (var k = j; k < j + byteDepth; k++)
                 {
-                    ptr[i] = temp[(k - a) + chDelta];
+                    ptr[i] = temp[(k - startDelta) + chDelta];
                     i++;
                 }
             }
 
             byteCount = outputBytesCount;
-            
+
             return ptr;
         }
 
@@ -643,5 +598,7 @@ namespace WavDotNet.Core
 
             return output;
         }
+
+        # endregion
     }
 }

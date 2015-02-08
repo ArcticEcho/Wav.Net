@@ -1,6 +1,4 @@
 ﻿/*
- * 
- * 
  * Wav.Net. A .Net 2.0 based library for transcoding ".wav" (wave) files.
  * Copyright © 2014, ArcticEcho.
  *
@@ -16,11 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
  */
-
-
 
 
 
@@ -29,8 +23,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
-
 
 namespace WavDotNet.Core
 {
@@ -61,6 +53,8 @@ namespace WavDotNet.Core
 
 
 
+        # region Constructors/destructor.
+
         public WavFileRead(string filePath)
         {
             if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
@@ -70,13 +64,10 @@ namespace WavDotNet.Core
             this.filePath = filePath;
             stream = File.OpenRead(filePath);
             AudioData = new Dictionary<ChannelPositions, SampleReader<T>>();
-            
+
             GetMeta();
-
             CheckMeta();
-
             stream.Dispose();
-
             AddChannels();
         }
 
@@ -93,11 +84,8 @@ namespace WavDotNet.Core
             AudioData = new Dictionary<ChannelPositions, SampleReader<T>>();
 
             GetMeta();
-
             CheckMeta();
-
             stream.Dispose();
-
             AddChannels();
         }
 
@@ -110,9 +98,7 @@ namespace WavDotNet.Core
             AudioData = new Dictionary<ChannelPositions, SampleReader<T>>();
 
             GetMeta();
-
             CheckMeta();
-
             AddChannels();
         }
 
@@ -127,9 +113,7 @@ namespace WavDotNet.Core
             AudioData = new Dictionary<ChannelPositions, SampleReader<T>>();
 
             GetMeta();
-
             CheckMeta();
-
             AddChannels();
         }
 
@@ -140,6 +124,8 @@ namespace WavDotNet.Core
                 Dispose();
             }
         }
+
+        # endregion
 
 
 
@@ -171,7 +157,6 @@ namespace WavDotNet.Core
             }
 
             GC.SuppressFinalize(this);
-
             disposed = true;
         }
 
@@ -274,20 +259,14 @@ namespace WavDotNet.Core
         private void CheckMeta()
         {
             if (BitDepth == 0) { throw new UnrecognisedWavFileException("File is displaying an invalid bit depth."); }
-
             if (ValidBits == 0) { throw new UnrecognisedWavFileException("File is displaying an invalid real bit depth."); }
-
             if (SampleRate == 0) { throw new UnrecognisedWavFileException("File is displaying an invalid sample rate."); }
-
             if (ChannelCount == 0) { throw new UnrecognisedWavFileException("File is displaying an invalid number of channels."); }
-
             if (Format == WavFormat.Unknown) { throw new UnrecognisedWavFileException("Can only read audio in either PCM or IEEE format."); }
-
             if (BitDepth != 8 && BitDepth != 16 && BitDepth != 24 && BitDepth != 32 && BitDepth != 64 && BitDepth != 128)
             {
                 throw new UnrecognisedWavFileException("File is of an unsupported bit depth of:" + BitDepth + ".\nSupported bit depths: 8, 16, 24, 32, 64 and 128.");
             }
-
             if (BitDepth < ValidBits)
             {
                 throw new UnrecognisedWavFileException("File is displaying an invalid bit depth and/or invalid vaild bits per sample. (The file is displaying a bit depth less than its vaild bits per sample field.)");

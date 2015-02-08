@@ -1,6 +1,4 @@
 ﻿/*
- * 
- * 
  * Wav.Net. A .Net 2.0 based library for transcoding ".wav" (wave) files.
  * Copyright © 2014, ArcticEcho.
  *
@@ -16,11 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
  */
-
-
 
 
 
@@ -29,8 +23,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-
-
 
 namespace WavDotNet.Core
 {
@@ -53,6 +45,8 @@ namespace WavDotNet.Core
         }
 
 
+
+        # region Constructors/destructor.
 
         public WavFileWrite(string filePath, uint sampleRate, WavFormat format, ushort bitDepth, ushort validBits)
         {
@@ -174,6 +168,8 @@ namespace WavDotNet.Core
             }
         }
 
+        # endregion
+
 
 
         public void Flush()
@@ -191,21 +187,17 @@ namespace WavDotNet.Core
                 Format = GuessFormat();
             }
 
-            stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+            using (stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                AudioLengthBytes = CalcAudioSize();
+                CheckAudioData();
 
-            AudioLengthBytes = CalcAudioSize();
+                var samples = CombineSamples();
+                WriteMetaData();
+                WriteAudioData(samples);
 
-            CheckAudioData();
-
-            var samples = CombineSamples();
-
-            WriteMetaData();
-
-            WriteAudioData(samples);
-
-            flushed = true;
-
-            stream.Dispose();
+                flushed = true;
+            }
         }
 
         public void Dispose()
@@ -499,44 +491,32 @@ namespace WavDotNet.Core
                 case 8:
                 {
                     WriteSamples8Bit(samples);
-
                     break;
                 }
 
                 case 16:
                 {
                     WriteSamples16Bit(samples);
-
                     break;
                 }
 
                 case 24:
                 {
                     WriteSamples24Bit(samples);
-
                     break;
                 }
 
                 case 32:
                 {
                     WriteSamples32Bit(samples);
-
                     break;
                 }
 
                 case 64:
                 {
                     WriteSamples64Bit(samples);
-
                     break;
                 }
-
-                //case 128:
-                //{
-                //	WriteSamples128Bit(samples);
-
-                //	break;
-                //}
 
                 default:
                 {
@@ -561,13 +541,13 @@ namespace WavDotNet.Core
             else
             {
                 WriteAsFloats(samples);
-            }		
+            }
         }
 
         private void WriteSamples16Bit(Samples<T> samples)
         {
             stream.Position = headerSize;
-            
+
             if (Format == WavFormat.Pcm)
             {
                 var converter = new SampleConverter<T, short>();
@@ -580,7 +560,7 @@ namespace WavDotNet.Core
             else
             {
                 WriteAsFloats(samples);
-            }	
+            }
         }
 
         private void WriteSamples24Bit(Samples<T> samples)
@@ -594,7 +574,6 @@ namespace WavDotNet.Core
                 foreach (var sample in samples)
                 {
                     var allBytes = BitConverter.GetBytes(converter.Convert(sample));
-
                     var sampleBytes = new[] { allBytes[0], allBytes[1], allBytes[2] };
 
                     stream.Write(sampleBytes, 0, 3);
@@ -603,7 +582,7 @@ namespace WavDotNet.Core
             else
             {
                 WriteAsFloats(samples);
-            }			
+            }
         }
 
         private void WriteSamples32Bit(Samples<T> samples)
@@ -649,27 +628,6 @@ namespace WavDotNet.Core
             }
         }
 
-        /// <summary>
-        /// WARNING! This method has not yet been fully tested.
-        /// </summary>
-        //private void WriteSamples128Bit(Samples<T> samples)
-        //{
-        //	stream.Position = headerSize;
-        //	var converted = new SampleConverter<T, decimal>().Convert(samples);
-
-        //	for (var i = 0; i < converted.Length; i++)
-        //	{
-        //		var bytes = new List<byte>();
-
-        //		foreach (var bin in decimal.GetBits(converted[i]))
-        //		{
-        //			bytes.AddRange(BitConverter.GetBytes(bin));
-        //		}
-
-        //		stream.Write(bytes.ToArray(), 0, bytes.Count);
-        //	}		
-        //}
-
         private void WriteAsFloats(Samples<T> samples)
         {
             var converter = new SampleConverter<T, float>();
@@ -700,11 +658,9 @@ namespace WavDotNet.Core
             }
 
             var combined = new List<T>();
-
             var sorted = SortChannels();
-
             var totalSampleCount = int.MaxValue;
-        
+
             // Find the smallest channel.
             for (var i = 0; i < sorted.Count; i++)
             {

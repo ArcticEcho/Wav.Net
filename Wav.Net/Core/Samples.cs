@@ -1,6 +1,4 @@
 ﻿/*
- * 
- * 
  * Wav.Net. A .Net 2.0 based library for transcoding ".wav" (wave) files.
  * Copyright © 2014, ArcticEcho.
  *
@@ -16,11 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
  */
-
-
 
 
 
@@ -29,12 +23,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-
-
 namespace WavDotNet.Core
 {
     public class Samples<T> : IEnumerable<T>
     {
+        private static readonly Regex typeCheck = new Regex(@"^System\.(U?Int\d{1,2}|S?Byte|Single|Double|Decimal)$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         private readonly GetSample sampleGetter;
         private readonly SetSample sampleSetter;
         private readonly AddSample sampleAdder;
@@ -97,7 +91,7 @@ namespace WavDotNet.Core
 
             var inTypeName = typeof(T).FullName;
 
-            if (!Regex.IsMatch(inTypeName, @"^System\.(U?Int\d{1,2}|S?Byte|Single|Double|Decimal)$", RegexOptions.CultureInvariant))
+            if (!typeCheck.IsMatch(inTypeName))
             {
                 throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
             }
@@ -113,7 +107,7 @@ namespace WavDotNet.Core
 
             var inTypeName = typeof(T).FullName;
 
-            if (!Regex.IsMatch(inTypeName, @"^System\.(U?Int\d{1,2}|S?Byte|Single|Double|Decimal)$", RegexOptions.CultureInvariant))
+            if (!typeCheck.IsMatch(inTypeName))
             {
                 throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
             }
@@ -131,7 +125,7 @@ namespace WavDotNet.Core
 
             var inTypeName = typeof(T).FullName;
 
-            if (!Regex.IsMatch(inTypeName, @"^System\.(U?Int\d{1,2}|S?Byte|Single|Double|Decimal)$", RegexOptions.CultureInvariant))
+            if (!typeCheck.IsMatch(inTypeName))
             {
                 throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
             }
@@ -153,7 +147,7 @@ namespace WavDotNet.Core
 
             var inTypeName = typeof(T).FullName;
 
-            if (!Regex.IsMatch(inTypeName, @"^System\.(U?Int\d{1,2}|S?Byte|Single|Double|Decimal)$", RegexOptions.CultureInvariant))
+            if (!typeCheck.IsMatch(inTypeName))
             {
                 throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
             }
@@ -169,7 +163,7 @@ namespace WavDotNet.Core
 
             var inTypeName = typeof(T).FullName;
 
-            if (!Regex.IsMatch(inTypeName, @"^System\.(U?Int\d{1,2}|S?Byte|Single|Double|Decimal)$", RegexOptions.CultureInvariant))
+            if (!typeCheck.IsMatch(inTypeName))
             {
                 throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
             }

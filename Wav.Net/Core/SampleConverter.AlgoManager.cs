@@ -1,6 +1,4 @@
 ﻿/*
- * 
- * 
  * Wav.Net. A .Net 2.0 based library for transcoding ".wav" (wave) files.
  * Copyright © 2014, ArcticEcho.
  *
@@ -16,19 +14,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
  */
-
-
 
 
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-
-
 
 namespace WavDotNet.Core
 {
@@ -328,8 +320,8 @@ namespace WavDotNet.Core
                     { "System.Int64", sample => (TTo)System.Convert.ChangeType(Math.Round(getSingle(sample) * 9223372036854775808), outType , CultureInfo.InvariantCulture) },
                     { "System.UInt64", sample => (TTo)System.Convert.ChangeType(Math.Round((getSingle(sample) * 9223372036854775808) + 9223372036854775808), outType , CultureInfo.InvariantCulture) },
                     { "System.Single", sample => (TTo)System.Convert.ChangeType(sample, outType , CultureInfo.InvariantCulture) },
-                    { "System.Double", sample => (TTo)System.Convert.ChangeType(/*getSingle(*/sample/*)*/, outType , CultureInfo.InvariantCulture) },
-                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(/*getSingle(*/sample/*)*/, outType , CultureInfo.InvariantCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType(sample, outType , CultureInfo.InvariantCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(sample, outType , CultureInfo.InvariantCulture) },
                 };
             }
 
@@ -347,7 +339,7 @@ namespace WavDotNet.Core
                     { "System.UInt64", sample => (TTo)System.Convert.ChangeType(Math.Round((getDouble(sample) * 9223372036854775808) + 9223372036854775808), outType , CultureInfo.InvariantCulture) },
                     { "System.Single", sample => (TTo)System.Convert.ChangeType(Math.Round(getDouble(sample), 7), outType , CultureInfo.InvariantCulture) },
                     { "System.Double", sample => (TTo)System.Convert.ChangeType(sample, outType , CultureInfo.InvariantCulture) },
-                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(/*getDouble(*/sample/*)*/, outType , CultureInfo.InvariantCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(sample, outType , CultureInfo.InvariantCulture) },
                 };
             }
 
@@ -369,5 +361,5 @@ namespace WavDotNet.Core
                 };
             }
         }
-    }	
+    }
 }
