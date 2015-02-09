@@ -20,7 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using WavDotNet.Core;
 
 namespace WavDotNet.Tools
@@ -63,7 +62,7 @@ namespace WavDotNet.Tools
                 }
             }
 
-            return smallestDiff == 0 ? 0 : System.Math.Log(1 / smallestDiff, 2);
+            return System.Math.Log(1 / smallestDiff, 2);
         }
 
         public static double EffectiveBitsOfPrecision(List<double> samples)
@@ -82,7 +81,7 @@ namespace WavDotNet.Tools
                 }
             }
 
-            return smallestDiff == 0 ? 0 : System.Math.Log(1 / smallestDiff, 2);
+            return System.Math.Log(1 / smallestDiff, 2);
         }
     }
 }
