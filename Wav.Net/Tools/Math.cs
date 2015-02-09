@@ -47,7 +47,7 @@ namespace WavDotNet.Tools
             return (float)System.Math.Pow(10, decibels / 20.0);
         }
 
-        public static double EffectiveBitDepth(List<float> samples)
+        public static double EffectiveBitsOfPrecision(List<float> samples)
         {
             var sorted = samples;
             sorted.Sort();
@@ -66,7 +66,7 @@ namespace WavDotNet.Tools
             return smallestDiff == 0 ? 0 : System.Math.Log(1 / smallestDiff, 2);
         }
 
-        public static double EffectiveBitDepth(List<double> samples)
+        public static double EffectiveBitsOfPrecision(List<double> samples)
         {
             var sorted = samples;
             sorted.Sort();
