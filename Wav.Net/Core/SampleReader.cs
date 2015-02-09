@@ -392,12 +392,7 @@ namespace WavDotNet.Core
 
             for (var i = 0; i < length; i += 2)
             {
-                var a = bytes[i];
-                var a_ = a; //<< 16;
-                var b = bytes[i + 1];
-                var b_ = b << 8;
-                var c = a_ | b_;
-                tempSamples[i / 2] = (short)c;//(bytes[i] << 16 | bytes[i + 1] << 24);
+                tempSamples[i / 2] = (short)(bytes[i] | bytes[i + 1] << 8);
             }
 
             Marshal.FreeHGlobal((IntPtr)bytes);
