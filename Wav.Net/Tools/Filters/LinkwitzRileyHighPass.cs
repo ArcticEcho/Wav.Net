@@ -23,6 +23,8 @@ using WavDotNet.Core;
 
 namespace WavDotNet.Tools.Filters
 {
+    using Math = System.Math;
+
     public class LinkwitzRileyHighPass
     {
         private readonly uint sampleRate;

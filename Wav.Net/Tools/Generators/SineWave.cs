@@ -23,6 +23,8 @@ using WavDotNet.Core;
 
 namespace WavDotNet.Tools.Generators
 {
+    using Math = System.Math;
+
     public class SineWave
     {
         private readonly int sampleRate;

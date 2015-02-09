@@ -48,10 +48,10 @@ namespace WavDotNet.Tools
             double lx1 = 0.0, ly1 = 0.0, lx2 = 0.0, ly2 = 0.0, lx3 = 0.0, ly3 = 0.0, lx4 = 0.0, ly4 = 0.0;
 
             // Calc params for sweeping filters.
-            var wp = minWp = (Math.PI * delay) / sampleRate;
-            var range = Math.Pow(2.0, depth);
-            var maxWp = (Math.PI * delay * range) / sampleRate;
-            rate = Math.Pow(range, rate / (sampleRate / 2.0));
+            var wp = minWp = (System.Math.PI * delay) / sampleRate;
+            var range = System.Math.Pow(2.0, depth);
+            var maxWp = (System.Math.PI * delay * range) / sampleRate;
+            rate = System.Math.Pow(range, rate / (sampleRate / 2.0));
             var sweepfac = rate;
 
             for (var i = 0; i < samples.Count; i++)
@@ -99,10 +99,10 @@ namespace WavDotNet.Tools
             float lx1 = 0f, ly1 = 0f, lx2 = 0f, ly2 = 0f, lx3 = 0f, ly3 = 0f, lx4 = 0f, ly4 = 0f;
 
             // Calc params for sweeping filters.
-            var wp = minWp = (float)((Math.PI * delay) / sampleRate);
-            var range = (float)Math.Pow(2.0, depth);
-            var maxWp = (float)((Math.PI * delay * range) / sampleRate);
-            rate = (float)Math.Pow(range, rate / (sampleRate / 2f));
+            var wp = minWp = (float)((System.Math.PI * delay) / sampleRate);
+            var range = (float)System.Math.Pow(2.0, depth);
+            var maxWp = (float)((System.Math.PI * delay * range) / sampleRate);
+            rate = (float)System.Math.Pow(range, rate / (sampleRate / 2f));
             var sweepfac = rate;
 
             for (var i = 0; i < samples.Count; i++)

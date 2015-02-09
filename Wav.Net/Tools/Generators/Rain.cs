@@ -24,6 +24,8 @@ using WavDotNet.Tools.Filters;
 
 namespace WavDotNet.Tools.Generators
 {
+    using Math = System.Math;
+
     /// <summary>
     /// Reproduces the sound of rain.
     /// </summary>

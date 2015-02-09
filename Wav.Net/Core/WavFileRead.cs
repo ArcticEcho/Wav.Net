@@ -333,7 +333,12 @@ namespace WavDotNet.Core
 
             foreach (var pos in Enum.GetValues(typeof(ChannelPositions)))
             {
-                positions.Add((uint)pos);
+                var ch = (uint)(ChannelPositions)pos;
+
+                if (ch != 0)
+                {
+                    positions.Add((uint)(ChannelPositions)pos);
+                }
             }
 
             for (var i = 0; i < channelCount; i++)
