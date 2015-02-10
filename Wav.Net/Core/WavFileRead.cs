@@ -237,7 +237,7 @@ namespace WavDotNet.Core
                     Buffer.BlockCopy(bytes, fmtStartIndex + 24, cmData, 0, 4);
                 }
             }
-            
+
             if (rbdData[0] == 0 && rbdData[1] == 0)
             {
                 // Real bit depth not specified, assume real bit depth is same as bit depth.
@@ -329,15 +329,17 @@ namespace WavDotNet.Core
             }
 
             uint mask = 0;
-            var positions = new List<uint>();
+            long[] posValues = (long[])Enum.GetValues(typeof(ChannelPositions));
+            var positions = new uint[posValues.Length];
 
-            foreach (var pos in Enum.GetValues(typeof(ChannelPositions)))
+            for (int i = 0, j = 0; i < posValues.Length; i++)
             {
-                var ch = (uint)(ChannelPositions)pos;
+                var pos = posValues[i];
 
-                if (ch != 0)
+                if (pos != 0)
                 {
-                    positions.Add((uint)(ChannelPositions)pos);
+                    positions[j] = (uint)pos;
+                    j++;
                 }
             }
 
