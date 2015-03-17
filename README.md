@@ -18,8 +18,9 @@ Current features:
  - Low pass filters: Linkwitz Riley & Bessel,
  - High pass filter: Linkwitz Riley,
  - Phase shifter,
- - Decibel/amplitude calculator,
- - Sample inverter.
+ - Sample inverter,
+ - Decibel/amplitude converter,
+ - Audio stream precision calculator.
  
 ---
 
