@@ -14,7 +14,7 @@ Audio support:
 
 Current features:
 
- - Tone generators: Sine, sawtooth, square, white noise & rain,
+ - Tone generators: Sine, sawtooth, square & white noise,
  - Low pass filters: Linkwitz Riley & Bessel,
  - High pass filter: Linkwitz Riley,
  - Phase shifter,
