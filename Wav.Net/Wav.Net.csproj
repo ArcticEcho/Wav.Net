@@ -59,6 +59,7 @@
     <Compile Include="Core\WavFileWrite.cs" />
     <Compile Include="Core\WavFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\Amplifier.cs" />
     <Compile Include="Tools\Filters\BesselLowPass.cs" />
     <Compile Include="Tools\Filters\LinkwitzRileyHighPass.cs" />
     <Compile Include="Tools\Filters\LinkwitzRileyLowPass.cs" />

@@ -46,9 +46,6 @@
     <Compile Include="UnitTesting\TestMath.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Wav.Net\Wav.Net.csproj">
       <Project>{05bb732f-9a16-4c82-a293-9d7144997242}</Project>
       <Name>Wav.Net</Name>

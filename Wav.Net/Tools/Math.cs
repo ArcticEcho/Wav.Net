@@ -26,24 +26,58 @@ namespace WavDotNet.Tools
 {
     public static class Math
     {
+        # region ToDecibels methods.
+
         public static double ToDecibels(double amplitude)
         {
             return System.Math.Log10(amplitude) * 20;
         }
 
-        public static float ToDecibels(float amplitude)
+        public static double ToDecibels(float amplitude)
         {
-            return (float)System.Math.Log10(amplitude) * 20;
+            return System.Math.Log10(amplitude) * 20;
         }
+
+        public static double ToDecibels(short amplitude)
+        {
+            return System.Math.Log10(amplitude / short.MaxValue) * 20;
+        }
+
+        # endregion
+
+        # region ToAmplitude methods.
 
         public static double ToAmplitude(double decibels)
         {
             return System.Math.Pow(10, decibels / 20.0);
         }
 
-        public static float ToAmplitude(float decibels)
+        public static double ToAmplitude(float decibels)
         {
-            return (float)System.Math.Pow(10, decibels / 20.0);
+            return System.Math.Pow(10, decibels / 20.0);
+        }
+
+        # endregion
+
+        # region EffectiveBitsOfPrecision methods.
+
+        public static double EffectiveBitsOfPrecision(List<double> samples)
+        {
+            var sorted = samples;
+            sorted.Sort();
+            var data = sorted.ToArray();
+            var smallestDiff = double.MaxValue;
+
+            for (var i = 0; i < data.Length - 1; i++)
+            {
+                var diff = data[i + 1] - data[i];
+                if (diff < smallestDiff && diff > 0)
+                {
+                    smallestDiff = diff;
+                }
+            }
+
+            return System.Math.Log(1 / smallestDiff, 2);
         }
 
         public static double EffectiveBitsOfPrecision(List<float> samples)
@@ -65,12 +99,12 @@ namespace WavDotNet.Tools
             return System.Math.Log(1 / smallestDiff, 2);
         }
 
-        public static double EffectiveBitsOfPrecision(List<double> samples)
+        public static double EffectiveBitsOfPrecision(List<short> samples)
         {
             var sorted = samples;
             sorted.Sort();
             var data = sorted.ToArray();
-            var smallestDiff = double.MaxValue;
+            var smallestDiff = (int)short.MaxValue;
 
             for (var i = 0; i < data.Length - 1; i++)
             {
@@ -83,5 +117,7 @@ namespace WavDotNet.Tools
 
             return System.Math.Log(1 / smallestDiff, 2);
         }
+
+        # endregion
     }
 }

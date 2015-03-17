@@ -243,7 +243,7 @@ namespace WavDotNet.Core
             buffer.Clear();
 
             var trueByteDepth = (audioFormat == WavFormat.FloatingPoint ? Math.Max((ushort)32, bitDepth) : bitDepth) / 8;
-            var endIndex = Math.Max((uint)(bufferCapacity / trueByteDepth) + sampleIndex, SampleCount);
+            var endIndex = Math.Min((uint)(bufferCapacity / trueByteDepth) + sampleIndex, SampleCount);
             var samples = LoadSamples(sampleIndex, endIndex);
 
             for (uint i = 0; i < samples.Count; i++)
