@@ -62,7 +62,6 @@
     <Compile Include="Tools\Filters\BesselLowPass.cs" />
     <Compile Include="Tools\Filters\LinkwitzRileyHighPass.cs" />
     <Compile Include="Tools\Filters\LinkwitzRileyLowPass.cs" />
-    <Compile Include="Tools\Generators\Rain.cs" />
     <Compile Include="Tools\Generators\Sawtooth.cs" />
     <Compile Include="Tools\Generators\SineWave.cs" />
     <Compile Include="Tools\Generators\SquareWave.cs" />
