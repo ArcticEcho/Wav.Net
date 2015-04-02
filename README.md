@@ -8,15 +8,15 @@ Audio support:
  - Bit depth: 8 to 64-bits,
  - Sample rate: 1 to 4,294,967,296Hz,
  - Audio format: PCM and IEEE floating-point,
- - Supports `Stream`s? Yep,
+ - Supports `Stream`s? Yes,
  - Max channels: 19,
  - Max file size: 2GiB.
 
 Current features:
 
  - Tone generators: Sine, sawtooth, square & white noise,
- - Low pass filters: Linkwitz Riley & Bessel,
- - High pass filter: Linkwitz Riley,
+ - Low pass filters: Linkwitz Riley (4th order) & Bessel (24dB/Oct),
+ - High pass filter: Linkwitz Riley (4th order),
  - Phase shifter,
  - Sample inverter,
  - Decibel/amplitude converter,
