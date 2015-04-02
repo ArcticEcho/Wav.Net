@@ -1,7 +1,7 @@
 Wav.Net [![Build Status](https://travis-ci.org/ArcticEcho/Wav.Net.svg?branch=master)](https://travis-ci.org/ArcticEcho/Wav.Net)
 =======
 
-Wav.Net is a fully featured .Net library<sup>§</sup> for transcoding wave files (reading, writing/creating, etc.). See [our code samples](https://github.com/ArcticEcho/Wav.Net/wiki/Code-Samples) for examples.
+Wav.Net is a fully featured .Net library<sup>§</sup> for transcoding wave files (reading, writing/creating, etc.).
 
 Audio support:
 
