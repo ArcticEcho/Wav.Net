@@ -26,6 +26,10 @@ using System.Text;
 
 namespace WavDotNet.Core
 {
+    /// <summary>
+    /// Represents a class for gathering data (metadata and actual audio data) from a .wav file.
+    /// </summary>
+    /// <typeparam name="T">The type of which all samples should be (converted if necessary, and) returned as.</typeparam>
     public class WavFileRead<T> : WavFile, IDisposable, IEnumerable<SampleReader<T>>
     {
         private readonly string filePath;
@@ -34,18 +38,29 @@ namespace WavDotNet.Core
         private uint speakerMask;
         private readonly Stream stream;
 
-        public uint? BufferCapacity { get; private set; }
+        /// <summary>
+        /// The size if the internal buffer(s) used when reading samples from the Stream/file.
+        /// </summary>
+        public uint BufferCapacity { get; private set; }
+
+        /// <summary>
+        /// A Dictionary of SampleReader<T>s paired with a channel (ChannelPositions) that represent the actual audio data within Stream/file.
+        /// </summary>
         public Dictionary<ChannelPositions, SampleReader<T>> AudioData { get; private set; }
+
+        /// <summary>
+        /// The total number of channels within the Stream/file.
+        /// </summary>
         public ushort ChannelCount { get; private set; }
 
+        /// <summary>
+        /// Returns a SampleReader<T> for a given ChannelPositions key.
+        /// </summary>
         public SampleReader<T> this[ChannelPositions channel]
         {
             get
             {
-                if (!AudioData.ContainsKey(channel))
-                {
-                    throw new KeyNotFoundException();
-                }
+                if (!AudioData.ContainsKey(channel)) { throw new KeyNotFoundException(); }
 
                 return AudioData[channel];
             }
@@ -64,6 +79,7 @@ namespace WavDotNet.Core
             this.filePath = filePath;
             stream = File.OpenRead(filePath);
             AudioData = new Dictionary<ChannelPositions, SampleReader<T>>();
+            BufferCapacity = SampleReader<int>.DefaultBufferSize;
 
             GetMeta();
             CheckMeta();
@@ -71,16 +87,16 @@ namespace WavDotNet.Core
             AddChannels();
         }
 
-        public WavFileRead(string filePath, uint? bufferCapacity)
+        public WavFileRead(string filePath, uint internalBufferCapacity)
         {
             if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
             if (!File.Exists(filePath)) { throw new FileNotFoundException(); }
             if (new FileInfo(filePath).Length > int.MaxValue) { throw new ArgumentException("File is too large. Must be less than 2 GiB.", "filePath"); }
-            if (bufferCapacity != null && bufferCapacity < 1024) { throw new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024."); }
+            if (internalBufferCapacity < 1024) { throw new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024."); }
 
             this.filePath = filePath;
             stream = File.OpenRead(filePath);
-            BufferCapacity = bufferCapacity;
+            BufferCapacity = internalBufferCapacity;
             AudioData = new Dictionary<ChannelPositions, SampleReader<T>>();
 
             GetMeta();
@@ -96,20 +112,21 @@ namespace WavDotNet.Core
 
             this.stream = stream;
             AudioData = new Dictionary<ChannelPositions, SampleReader<T>>();
+            BufferCapacity = SampleReader<int>.DefaultBufferSize;
 
             GetMeta();
             CheckMeta();
             AddChannels();
         }
 
-        public WavFileRead(Stream stream, uint? bufferCapacity)
+        public WavFileRead(Stream stream, uint internalBufferCapacity)
         {
             if (stream == null) { throw new ArgumentNullException("stream"); }
-            if (bufferCapacity != null && bufferCapacity < 1024) { throw new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024."); }
             if (stream.Length > int.MaxValue) { throw new ArgumentException("Stream is too large. Must be less than 2GiB.", "stream"); }
+            if (internalBufferCapacity < 1024) { throw new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024."); }
 
             this.stream = stream;
-            BufferCapacity = bufferCapacity;
+            BufferCapacity = internalBufferCapacity;
             AudioData = new Dictionary<ChannelPositions, SampleReader<T>>();
 
             GetMeta();
@@ -128,7 +145,9 @@ namespace WavDotNet.Core
         # endregion
 
 
-
+        /// <summary>
+        /// Returns a SampleReader<T> for the given channel.
+        /// </summary>
         public SampleReader<T> GetChannel(ChannelPositions channel)
         {
             foreach (var ch in AudioData)
@@ -142,6 +161,11 @@ namespace WavDotNet.Core
             throw new KeyNotFoundException("The file does not contain channel: " + channel);
         }
 
+        /// <summary>
+        /// Checks whether the specified channel exists in the Stream/file.
+        /// </summary>
+        /// <param name="channel">To channel to check.</param>
+        /// <returns>True if the channel is present, otherwise, false.</returns>
         public bool ChannelExists(ChannelPositions channel)
         {
             return AudioData.ContainsKey(channel);
@@ -269,7 +293,7 @@ namespace WavDotNet.Core
             }
             if (BitDepth < ValidBits)
             {
-                throw new UnrecognisedWavFileException("File is displaying an invalid bit depth and/or invalid vaild bits per sample. (The file is displaying a bit depth less than its vaild bits per sample field.)");
+                throw new UnrecognisedWavFileException("File is displaying an invalid bit depth and/or invalid valid bits per sample. (The file is displaying a bit depth less than its vaild bits per sample field.)");
             }
         }
 
@@ -285,11 +309,11 @@ namespace WavDotNet.Core
 
                     if (filePath != null)
                     {
-                        reader = BufferCapacity == null ? new SampleReader<T>(filePath, ChannelPositions.Mono) : new SampleReader<T>(filePath, ChannelPositions.Mono, BufferCapacity);
+                        reader = new SampleReader<T>(filePath, ChannelPositions.Mono, BufferCapacity);
                     }
                     else
                     {
-                        reader = BufferCapacity == null ? new SampleReader<T>(stream, ChannelPositions.Mono) : new SampleReader<T>(stream, ChannelPositions.Mono, BufferCapacity);
+                        reader = new SampleReader<T>(stream, ChannelPositions.Mono, BufferCapacity);
                     }
 
                     AudioData.Add(ChannelPositions.Mono, reader);
@@ -310,11 +334,11 @@ namespace WavDotNet.Core
 
                 if (filePath != null)
                 {
-                    reader = BufferCapacity == null ? new SampleReader<T>(filePath, ch) : new SampleReader<T>(filePath, ch, BufferCapacity);
+                    reader = new SampleReader<T>(filePath, ch, BufferCapacity);
                 }
                 else
                 {
-                    reader = BufferCapacity == null ? new SampleReader<T>(stream, ch) : new SampleReader<T>(stream, ch, BufferCapacity);
+                    reader = new SampleReader<T>(stream, ch, BufferCapacity);
                 }
 
                 AudioData.Add(ch, reader);
