@@ -181,6 +181,8 @@ namespace WavDotNet.Core
             Format = format;
             BitDepth = bitDepth;
             ValidBits = validBits;
+            
+            return null;
         }
         
         private Exception InitialiseFromStream(Stream stream, uint sampleRate, WavFormat format = WavFormat.Unknown, ushort bitDepth = 0, ushort validBits = 0)
