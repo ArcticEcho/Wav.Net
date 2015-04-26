@@ -28,7 +28,7 @@ namespace WavDotNet.Core
 {
     public class WavFileWrite<T> : WavFile, IDisposable
     {
-        private readonly string filePath;
+        private string filePath;
         private Stream stream;
         private int headerSize;
         private bool flushed;
@@ -287,7 +287,7 @@ namespace WavDotNet.Core
             ValidBits = validBits;
         }
         
-        private Exception InitialiseFromStream(Stream stream, uint sampleRate, WavFormat format = WavFromat.Unknown, ushort bitDepth = 0, ushort validBits = 0)
+        private Exception InitialiseFromStream(Stream stream, uint sampleRate, WavFormat format = WavFormat.Unknown, ushort bitDepth = 0, ushort validBits = 0)
         {
             if (stream == null) { return new ArgumentNullException("stream"); }
             if (sampleRate == 0) { return new ArgumentOutOfRangeException("sampleRate", "Must not be 0."); }
