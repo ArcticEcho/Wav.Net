@@ -28,8 +28,8 @@ namespace WavDotNet.Core
     {
         private class AlgoManager<TFrom, TTo>
         {
+            private static readonly CultureInfo invCulture = CultureInfo.InvariantCulture;
             private readonly Type outType = typeof(TTo);
-            private readonly CultureInfo invCulture = CultureInfo.InvariantCulture;
 
             #region Private delegates.
 
@@ -46,16 +46,16 @@ namespace WavDotNet.Core
             private delegate decimal GetDecimal(TFrom sample);
 
             private readonly GetSByte getSByte = sample => (sbyte?)System.Convert.ChangeType(sample, typeof(sbyte), invCulture) ?? 0;
-            private readonly GetByte getByte = sample => (byte?)Convert.ChangeType(sample, typeof(byte), invCulture) ?? 0;
-            private readonly GetInt16 getInt16 = sample => (short?)Convert.ChangeType(sample, typeof(short), invCulture) ?? 0;
-            private readonly GetUInt16 getUInt16 = sample => (ushort?)Convert.ChangeType(sample, typeof(ushort), invCulture) ?? 0;
-            private readonly GetInt32 getInt32 = sample => (int?)Convert.ChangeType(sample, typeof(int), invCulture) ?? 0;
-            private readonly GetUInt32 getUInt32 = sample => (uint?)Convert.ChangeType(sample, typeof(uint), invCulture) ?? 0;
-            private readonly GetInt64 getInt64 = sample => (long?)Convert.ChangeType(sample, typeof(long), invCulture) ?? 0;
-            private readonly GetUInt64 getUInt64 = sample => (ulong?)Convert.ChangeType(sample, typeof(ulong), invCulture) ?? 0;
-            private readonly GetSingle getSingle = sample => (float?)Convert.ChangeType(sample, typeof(float), invCulture) ?? 0;
-            private readonly GetDouble getDouble = sample => (double?)Convert.ChangeType(sample, typeof(double), invCulture) ?? 0;
-            private readonly GetDecimal getDecimal = sample => (decimal?)Convert.ChangeType(sample, typeof(decimal), invCulture) ?? 0;
+            private readonly GetByte getByte = sample => (byte?)System.Convert.ChangeType(sample, typeof(byte), invCulture) ?? 0;
+            private readonly GetInt16 getInt16 = sample => (short?)System.Convert.ChangeType(sample, typeof(short), invCulture) ?? 0;
+            private readonly GetUInt16 getUInt16 = sample => (ushort?)System.Convert.ChangeType(sample, typeof(ushort), invCulture) ?? 0;
+            private readonly GetInt32 getInt32 = sample => (int?)System.Convert.ChangeType(sample, typeof(int), invCulture) ?? 0;
+            private readonly GetUInt32 getUInt32 = sample => (uint?)System.Convert.ChangeType(sample, typeof(uint), invCulture) ?? 0;
+            private readonly GetInt64 getInt64 = sample => (long?)System.Convert.ChangeType(sample, typeof(long), invCulture) ?? 0;
+            private readonly GetUInt64 getUInt64 = sample => (ulong?)System.Convert.ChangeType(sample, typeof(ulong), invCulture) ?? 0;
+            private readonly GetSingle getSingle = sample => (float?)System.Convert.ChangeType(sample, typeof(float), invCulture) ?? 0;
+            private readonly GetDouble getDouble = sample => (double?)System.Convert.ChangeType(sample, typeof(double), invCulture) ?? 0;
+            private readonly GetDecimal getDecimal = sample => (decimal?)System.Convert.ChangeType(sample, typeof(decimal), invCulture) ?? 0;
 
             # endregion
 
@@ -168,17 +168,17 @@ namespace WavDotNet.Core
             {
                 fromSByte = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(getSByte(sample) + 128, outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType(getSByte(sample) * 256, outType, invCulture) },
-                    { "System.UInt16", sample => (TTo)Convert.ChangeType((getSByte(sample) + 128) * 256, outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType(getSByte(sample) * 16777216, outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType((getSByte(sample) + 128) * 16777216, outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType(getSByte(sample) * 72057594037927936, outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType((getSByte(sample) + 128) * 72057594037927936, outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType(getSByte(sample) / 128F, outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType(getSByte(sample) / 128D, outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType(getSByte(sample) / 128M, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(getSByte(sample) + 128, outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType(getSByte(sample) * 256, outType, invCulture) },
+                    { "System.UInt16", sample => (TTo)System.Convert.ChangeType((getSByte(sample) + 128) * 256, outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType(getSByte(sample) * 16777216, outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType((getSByte(sample) + 128) * 16777216, outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType(getSByte(sample) * 72057594037927936, outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType((getSByte(sample) + 128) * 72057594037927936, outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType(getSByte(sample) / 128F, outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType(getSByte(sample) / 128D, outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(getSByte(sample) / 128M, outType, invCulture) },
                 };
             }
 
@@ -186,17 +186,17 @@ namespace WavDotNet.Core
             {
                 fromByte = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(getByte(sample) - 128, outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType((getByte(sample) - 128) * 256, outType, invCulture) },
-                    { "System.UInt16", sample => (TTo)Convert.ChangeType(getByte(sample) * 256, outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType((getByte(sample) - 128) * 16777216, outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType(getByte(sample) * 16777216, outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType((getByte(sample) - 128) * 72057594037927936, outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType(getByte(sample) * 72057594037927936, outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType((getByte(sample) - 128) / 128F, outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType((getByte(sample) - 128) / 128D, outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType((getByte(sample) - 128) / 128M, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(getByte(sample) - 128, outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType((getByte(sample) - 128) * 256, outType, invCulture) },
+                    { "System.UInt16", sample => (TTo)System.Convert.ChangeType(getByte(sample) * 256, outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType((getByte(sample) - 128) * 16777216, outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType(getByte(sample) * 16777216, outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType((getByte(sample) - 128) * 72057594037927936, outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType(getByte(sample) * 72057594037927936, outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType((getByte(sample) - 128) / 128F, outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType((getByte(sample) - 128) / 128D, outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType((getByte(sample) - 128) / 128M, outType, invCulture) },
                 };
             }
 
@@ -204,17 +204,17 @@ namespace WavDotNet.Core
             {
                 fromInt16 = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(Math.Round(getInt16(sample) / 256F), outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(Math.Round(getInt16(sample) / 256F) + 128, outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.UInt16", sample => (TTo)Convert.ChangeType(getInt16(sample) + 32768, outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType(getInt16(sample) * 65536, outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType((getInt16(sample) + 32768) * 65536, outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType(getInt16(sample) * 281474976710656, outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType((getInt16(sample) + 32768) * 281474976710656, outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType(getInt16(sample) / 32768F, outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType(getInt16(sample) / 32768D, outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType(getInt16(sample) / 32768M, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(Math.Round(getInt16(sample) / 256F), outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(Math.Round(getInt16(sample) / 256F) + 128, outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.UInt16", sample => (TTo)System.Convert.ChangeType(getInt16(sample) + 32768, outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType(getInt16(sample) * 65536, outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType((getInt16(sample) + 32768) * 65536, outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType(getInt16(sample) * 281474976710656, outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType((getInt16(sample) + 32768) * 281474976710656, outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType(getInt16(sample) / 32768F, outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType(getInt16(sample) / 32768D, outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(getInt16(sample) / 32768M, outType, invCulture) },
                 };
             }
 
@@ -222,17 +222,17 @@ namespace WavDotNet.Core
             {
                 fromUInt16 = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(Math.Round(getUInt16(sample) / 256F) - 128, outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(Math.Round(getUInt16(sample) / 256F), outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType(getUInt16(sample) - 32768, outType, invCulture) },
-                    { "System.UInt16", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType((getUInt16(sample) - 32768) * 65536, outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType(getUInt16(sample) * 65536, outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType((getUInt16(sample) - 32768) * 281474976710656, outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType(getUInt16(sample) * 281474976710656, outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType((getUInt16(sample) - 32768) / 32768F, outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType((getUInt16(sample) - 32768) / 32768D, outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType((getUInt16(sample) - 32768) / 32768M, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(Math.Round(getUInt16(sample) / 256F) - 128, outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(Math.Round(getUInt16(sample) / 256F), outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType(getUInt16(sample) - 32768, outType, invCulture) },
+                    { "System.UInt16", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType((getUInt16(sample) - 32768) * 65536, outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType(getUInt16(sample) * 65536, outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType((getUInt16(sample) - 32768) * 281474976710656, outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType(getUInt16(sample) * 281474976710656, outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType((getUInt16(sample) - 32768) / 32768F, outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType((getUInt16(sample) - 32768) / 32768D, outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType((getUInt16(sample) - 32768) / 32768M, outType, invCulture) },
                 };
             }
 
@@ -240,17 +240,17 @@ namespace WavDotNet.Core
             {
                 fromInt32 = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(Math.Round(getInt32(sample) / 16777216F), outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(Math.Round((getInt32(sample) / 16777216F) + 128), outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType(Math.Round(getInt32(sample) / 65536F), outType, invCulture) },
-                    { "System.UInt16", sample => (TTo)Convert.ChangeType(Math.Round((getInt32(sample) / 65536F) + 32768), outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType(getInt32(sample) + 2147483648, outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType(getInt32(sample) * 4294967296, outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType((getInt32(sample) + 2147483648) * 4294967296, outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType(getInt32(sample) / 2147483648F, outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType(getInt32(sample) / 2147483648D, outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType(getInt32(sample) / 2147483648M, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(Math.Round(getInt32(sample) / 16777216F), outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(Math.Round((getInt32(sample) / 16777216F) + 128), outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType(Math.Round(getInt32(sample) / 65536F), outType, invCulture) },
+                    { "System.UInt16", sample => (TTo)System.Convert.ChangeType(Math.Round((getInt32(sample) / 65536F) + 32768), outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType(getInt32(sample) + 2147483648, outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType(getInt32(sample) * 4294967296, outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType((getInt32(sample) + 2147483648) * 4294967296, outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType(getInt32(sample) / 2147483648F, outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType(getInt32(sample) / 2147483648D, outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(getInt32(sample) / 2147483648M, outType, invCulture) },
                 };
             }
 
@@ -258,17 +258,17 @@ namespace WavDotNet.Core
             {
                 fromUInt32 = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(Math.Round((getUInt32(sample) / 16777216F) - 128), outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(Math.Round(getUInt32(sample) / 16777216F), outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType(Math.Round((getUInt32(sample) / 65536F) - 32768), outType, invCulture) },
-                    { "System.UInt16", sample => (TTo)Convert.ChangeType(Math.Round(getUInt32(sample) / 65536F), outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType(getUInt32(sample) - 2147483648, outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType((getUInt32(sample) - 2147483648) * 4294967296, outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType(getUInt32(sample) * 4294967296, outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType((getUInt32(sample) - 2147483648) / 2147483648F, outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType((getUInt32(sample) - 2147483648) / 2147483648F, outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType((getUInt32(sample) - 2147483648) / 2147483648F, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(Math.Round((getUInt32(sample) / 16777216F) - 128), outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(Math.Round(getUInt32(sample) / 16777216F), outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType(Math.Round((getUInt32(sample) / 65536F) - 32768), outType, invCulture) },
+                    { "System.UInt16", sample => (TTo)System.Convert.ChangeType(Math.Round(getUInt32(sample) / 65536F), outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType(getUInt32(sample) - 2147483648, outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType((getUInt32(sample) - 2147483648) * 4294967296, outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType(getUInt32(sample) * 4294967296, outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType((getUInt32(sample) - 2147483648) / 2147483648F, outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType((getUInt32(sample) - 2147483648) / 2147483648F, outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType((getUInt32(sample) - 2147483648) / 2147483648F, outType, invCulture) },
                 };
             }
 
@@ -276,17 +276,17 @@ namespace WavDotNet.Core
             {
                 fromInt64 = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(Math.Round(getInt64(sample) / 72057594037927936F), outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(Math.Round((getInt64(sample) / 72057594037927936F) + 128), outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType(Math.Round(getInt64(sample) / 281474976710656F), outType, invCulture) },
-                    { "System.UInt16", sample => (TTo)Convert.ChangeType(Math.Round((getInt64(sample) / 281474976710656F) + 32768), outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType(Math.Round(getInt64(sample) / 4294967296F), outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType(Math.Round((getInt64(sample) / 4294967296F) + 2147483648), outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType((ulong)getInt64(sample) + 9223372036854775808, outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType(getInt64(sample) / 9223372036854775808F, outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType(getInt64(sample) / 9223372036854775808D, outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType(getInt64(sample) / 9223372036854775808M, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(Math.Round(getInt64(sample) / 72057594037927936F), outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(Math.Round((getInt64(sample) / 72057594037927936F) + 128), outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType(Math.Round(getInt64(sample) / 281474976710656F), outType, invCulture) },
+                    { "System.UInt16", sample => (TTo)System.Convert.ChangeType(Math.Round((getInt64(sample) / 281474976710656F) + 32768), outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType(Math.Round(getInt64(sample) / 4294967296F), outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType(Math.Round((getInt64(sample) / 4294967296F) + 2147483648), outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType((ulong)getInt64(sample) + 9223372036854775808, outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType(getInt64(sample) / 9223372036854775808F, outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType(getInt64(sample) / 9223372036854775808D, outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(getInt64(sample) / 9223372036854775808M, outType, invCulture) },
                 };
             }
 
@@ -294,17 +294,17 @@ namespace WavDotNet.Core
             {
                 fromUInt64 = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(Math.Round((getUInt64(sample) / 72057594037927936F) - 128), outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(Math.Round(getUInt64(sample) / 72057594037927936F), outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType(Math.Round((getUInt64(sample) / 281474976710656F) - 32768), outType, invCulture) },
-                    { "System.UInt16", sample => (TTo)Convert.ChangeType(Math.Round(getUInt64(sample) / 281474976710656F), outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType(Math.Round((getUInt64(sample) / 4294967296F) - 2147483648), outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType(Math.Round(getUInt64(sample) / 4294967296F), outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType(getUInt64(sample) - 9223372036854775808, outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType((getUInt64(sample) - 9223372036854775808) / 9223372036854775808F, outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType((getUInt64(sample) - 9223372036854775808) / 9223372036854775808D, outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType((getUInt64(sample) - 9223372036854775808) / 9223372036854775808M, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(Math.Round((getUInt64(sample) / 72057594037927936F) - 128), outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(Math.Round(getUInt64(sample) / 72057594037927936F), outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType(Math.Round((getUInt64(sample) / 281474976710656F) - 32768), outType, invCulture) },
+                    { "System.UInt16", sample => (TTo)System.Convert.ChangeType(Math.Round(getUInt64(sample) / 281474976710656F), outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType(Math.Round((getUInt64(sample) / 4294967296F) - 2147483648), outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType(Math.Round(getUInt64(sample) / 4294967296F), outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType(getUInt64(sample) - 9223372036854775808, outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType((getUInt64(sample) - 9223372036854775808) / 9223372036854775808F, outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType((getUInt64(sample) - 9223372036854775808) / 9223372036854775808D, outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType((getUInt64(sample) - 9223372036854775808) / 9223372036854775808M, outType, invCulture) },
                 };
             }
 
@@ -312,17 +312,17 @@ namespace WavDotNet.Core
             {
                 fromSingle = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(Math.Round(getSingle(sample) * 128), outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(Math.Round((getSingle(sample) * 128) + 128), outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType(Math.Round(getSingle(sample) * 32768), outType, invCulture) },
-                    { "System.UInt16",sample => (TTo)Convert.ChangeType(Math.Round((getSingle(sample) * 32768) + 32768), outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType(Math.Round(getSingle(sample) * 2147483648), outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType(Math.Round((getSingle(sample) * 2147483648) + 2147483648), outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType(Math.Round(getSingle(sample) * 9223372036854775808), outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType(Math.Round((getSingle(sample) * 9223372036854775808) + 9223372036854775808), outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(Math.Round(getSingle(sample) * 128), outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(Math.Round((getSingle(sample) * 128) + 128), outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType(Math.Round(getSingle(sample) * 32768), outType, invCulture) },
+                    { "System.UInt16",sample => (TTo)System.Convert.ChangeType(Math.Round((getSingle(sample) * 32768) + 32768), outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType(Math.Round(getSingle(sample) * 2147483648), outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType(Math.Round((getSingle(sample) * 2147483648) + 2147483648), outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType(Math.Round(getSingle(sample) * 9223372036854775808), outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType(Math.Round((getSingle(sample) * 9223372036854775808) + 9223372036854775808), outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
                 };
             }
 
@@ -330,17 +330,17 @@ namespace WavDotNet.Core
             {
                 fromDouble = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(Math.Round(getDouble(sample) * 128), outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(Math.Round((getDouble(sample) * 128) + 128), outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType(Math.Round(getDouble(sample) * 32768), outType, invCulture) },
-                    { "System.UInt16",sample => (TTo)Convert.ChangeType(Math.Round((getDouble(sample) * 32768) + 32768), outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType(Math.Round(getDouble(sample) * 2147483648), outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType(Math.Round((getDouble(sample) * 2147483648) + 2147483648), outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType(Math.Round(getDouble(sample) * 9223372036854775808), outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType(Math.Round((getDouble(sample) * 9223372036854775808) + 9223372036854775808), outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType(Math.Round(getDouble(sample), 7), outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(Math.Round(getDouble(sample) * 128), outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(Math.Round((getDouble(sample) * 128) + 128), outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType(Math.Round(getDouble(sample) * 32768), outType, invCulture) },
+                    { "System.UInt16",sample => (TTo)System.Convert.ChangeType(Math.Round((getDouble(sample) * 32768) + 32768), outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType(Math.Round(getDouble(sample) * 2147483648), outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType(Math.Round((getDouble(sample) * 2147483648) + 2147483648), outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType(Math.Round(getDouble(sample) * 9223372036854775808), outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType(Math.Round((getDouble(sample) * 9223372036854775808) + 9223372036854775808), outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType(Math.Round(getDouble(sample), 7), outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
                 };
             }
 
@@ -348,17 +348,17 @@ namespace WavDotNet.Core
             {
                 fromDecimal = new Dictionary<string, Algo>
                 {
-                    { "System.SByte", sample => (TTo)Convert.ChangeType(Math.Round(getDecimal(sample) * 128), outType, invCulture) },
-                    { "System.Byte", sample => (TTo)Convert.ChangeType(Math.Round((getDecimal(sample) * 128) + 128), outType, invCulture) },
-                    { "System.Int16", sample => (TTo)Convert.ChangeType(Math.Round(getDecimal(sample) * 32768), outType, invCulture) },
-                    { "System.UInt16",sample => (TTo)Convert.ChangeType(Math.Round((getDecimal(sample) * 32768) + 32768), outType, invCulture) },
-                    { "System.Int32", sample => (TTo)Convert.ChangeType(Math.Round(getDecimal(sample) * 2147483648), outType, invCulture) },
-                    { "System.UInt32", sample => (TTo)Convert.ChangeType(Math.Round((getDecimal(sample) * 2147483648) + 2147483648), outType, invCulture) },
-                    { "System.Int64", sample => (TTo)Convert.ChangeType(Math.Round(getDecimal(sample) * 9223372036854775808), outType, invCulture) },
-                    { "System.UInt64", sample => (TTo)Convert.ChangeType(Math.Round((getDecimal(sample) * 9223372036854775808) + 9223372036854775808), outType, invCulture) },
-                    { "System.Single", sample => (TTo)Convert.ChangeType(Math.Round(getDecimal(sample), 7), outType, invCulture) },
-                    { "System.Double", sample => (TTo)Convert.ChangeType(Math.Round(getDecimal(sample), 15), outType, invCulture) },
-                    { "System.Decimal", sample => (TTo)Convert.ChangeType(sample, outType, invCulture) },
+                    { "System.SByte", sample => (TTo)System.Convert.ChangeType(Math.Round(getDecimal(sample) * 128), outType, invCulture) },
+                    { "System.Byte", sample => (TTo)System.Convert.ChangeType(Math.Round((getDecimal(sample) * 128) + 128), outType, invCulture) },
+                    { "System.Int16", sample => (TTo)System.Convert.ChangeType(Math.Round(getDecimal(sample) * 32768), outType, invCulture) },
+                    { "System.UInt16",sample => (TTo)System.Convert.ChangeType(Math.Round((getDecimal(sample) * 32768) + 32768), outType, invCulture) },
+                    { "System.Int32", sample => (TTo)System.Convert.ChangeType(Math.Round(getDecimal(sample) * 2147483648), outType, invCulture) },
+                    { "System.UInt32", sample => (TTo)System.Convert.ChangeType(Math.Round((getDecimal(sample) * 2147483648) + 2147483648), outType, invCulture) },
+                    { "System.Int64", sample => (TTo)System.Convert.ChangeType(Math.Round(getDecimal(sample) * 9223372036854775808), outType, invCulture) },
+                    { "System.UInt64", sample => (TTo)System.Convert.ChangeType(Math.Round((getDecimal(sample) * 9223372036854775808) + 9223372036854775808), outType, invCulture) },
+                    { "System.Single", sample => (TTo)System.Convert.ChangeType(Math.Round(getDecimal(sample), 7), outType, invCulture) },
+                    { "System.Double", sample => (TTo)System.Convert.ChangeType(Math.Round(getDecimal(sample), 15), outType, invCulture) },
+                    { "System.Decimal", sample => (TTo)System.Convert.ChangeType(sample, outType, invCulture) },
                 };
             }
         }
