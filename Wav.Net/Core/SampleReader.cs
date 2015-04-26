@@ -146,88 +146,24 @@ namespace WavDotNet.Core
         {
             var ex = InitialiseFromFile(filePath, channel, internalBufferCapacity);
             if (ex != null) { throw ex; }
-            
-            
-            
-            /*if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
-            if (!File.Exists(filePath)) { throw new FileNotFoundException(); }
-            if (new FileInfo(filePath).Length > int.MaxValue) { throw new ArgumentException("File is too large. Must be less than 2 GiB.", "filePath"); }
-            if (internalBufferCapacity < 1024) { throw new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024."); }
-
-            stream = File.OpenRead(filePath);
-            Channel = channel;
-
-            GetMeta();
-            CheckMeta();
-
-            this.bufferCapacity = (uint)internalBufferCapacity;
-            buffer = new Dictionary<uint, T>();
-            UpdateBuffer(0);*/
         }
 
         public SampleReader(string filePath, ChannelPositions channel)
         {
             var ex = InitialiseFromFile(filePath, channel, DefaultBufferSize);
             if (ex != null) { throw ex; }
-            
-            
-            
-            /*if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
-            if (!File.Exists(filePath)) { throw new FileNotFoundException(); }
-            if (new FileInfo(filePath).Length > int.MaxValue) { throw new ArgumentException("File is too large. Must be less than 2 GiB.", "filePath"); }
-
-            stream = File.OpenRead(filePath);
-            Channel = channel;
-
-            GetMeta();
-            CheckMeta();
-
-            bufferCapacity = DefaultBufferSize;
-            buffer = new Dictionary<uint, T>();
-            UpdateBuffer(0);*/
         }
 
         public SampleReader(Stream stream, ChannelPositions channel, uint internalBufferCapacity)
         {
             var ex = InitialiseFromStream(stream, channel, internalBufferCapacity);
             if (ex != null) { throw ex; }
-            
-            
-            
-            /*if (stream == null) { throw new ArgumentNullException("stream"); }
-            if (stream.Length > int.MaxValue) { throw new ArgumentException("Stream is too large. Must be less than 2GiB.", "stream"); }
-            if (internalBufferCapacity < 1024) { throw new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024."); }
-
-            this.stream = stream;
-            Channel = channel;
-
-            GetMeta();
-            CheckMeta();
-
-            this.bufferCapacity = (uint)internalBufferCapacity;
-            buffer = new Dictionary<uint, T>();
-            UpdateBuffer(0);*/
         }
 
         public SampleReader(Stream stream, ChannelPositions channel)
         {
             var ex = InitialiseFromStream(stream, channel, DefaultBufferSize);
             if (ex != null) { throw ex; }
-            
-            
-            
-            /*if (stream == null) { throw new ArgumentNullException("stream"); }
-            if (stream.Length > int.MaxValue) { throw new ArgumentException("Stream is too large. Must be less than 2GiB.", "stream"); }
-
-            this.stream = stream;
-            Channel = channel;
-
-            GetMeta();
-            CheckMeta();
-
-            bufferCapacity = DefaultBufferSize;
-            buffer = new Dictionary<uint, T>();
-            UpdateBuffer(0);*/
         }
 
         ~SampleReader()
