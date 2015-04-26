@@ -321,8 +321,8 @@ namespace WavDotNet.Core
                 return new UnrecognisedWavFileException("File is of an unsupported bit depth of:" + bitDepth + ".\nSupported bit depths: 8, 16, 24, 32 & 64.");
             }
             var contains = false;
-            var channels = FindExistingChannels(speakerMask);
-            foreach (var ch in channels)
+            var chns = FindExistingChannels(speakerMask);
+            foreach (var ch in chns)
             {
                 if (ch == Channel) { contains = true; break; }
             }
