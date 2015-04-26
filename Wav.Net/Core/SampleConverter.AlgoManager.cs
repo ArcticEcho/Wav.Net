@@ -29,7 +29,7 @@ namespace WavDotNet.Core
         private class AlgoManager<TFrom, TTo>
         {
             private readonly Type outType = typeof(TTo);
-            private readonly invCulture = CultureInfo.InvariantCulture;
+            private readonly CultureInfo invCulture = CultureInfo.InvariantCulture;
 
             #region Private delegates.
 
