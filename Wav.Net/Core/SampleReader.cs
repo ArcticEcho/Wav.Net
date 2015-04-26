@@ -34,9 +34,9 @@ namespace WavDotNet.Core
     public class SampleReader<T> : IDisposable, IEnumerable<T>
     {
         private bool disposed;
-        private readonly Stream stream;
-        private readonly Dictionary<uint, T> buffer;
-        private readonly uint bufferCapacity;
+        private Stream stream;
+        private Dictionary<uint, T> buffer;
+        private uint bufferCapacity;
         
         // Create a new class for holding Wav meta data such as the below (plus sample rate).
         // Then require the caller to pass the new meta data object to the constructor (rather
