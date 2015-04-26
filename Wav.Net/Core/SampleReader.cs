@@ -254,8 +254,8 @@ namespace WavDotNet.Core
         /// </summary>
         public Samples<T> LoadSamples(uint startIndex, uint endIndex)
         {
-            if (endIndex == 0) { throw new ArgumentOutOfRangeException("endIndex", "endIndex must be more than 0."); }
-            if (startIndex > endIndex) { throw new ArgumentOutOfRangeException("startIndex", "startIndex must be less than endIndex."); }
+            if (endIndex == 0) { throw new ArgumentOutOfRangeException("endIndex", "'endIndex' must be more than 0."); }
+            if (startIndex > endIndex) { throw new ArgumentOutOfRangeException("startIndex", "'startIndex' must be less than endIndex."); }
 
             return ReadAudioData(startIndex, endIndex);
         }
@@ -302,11 +302,11 @@ namespace WavDotNet.Core
 
         private Exception InitialiseFromFile(string filePath, ChannelPositions channel, uint internalBufferCapacity)
         {
-            if (String.IsNullOrEmpty(filePath)) { return new ArgumentException("Can not be null or empty.", "filePath"); }
+            if (String.IsNullOrEmpty(filePath)) { return new ArgumentException("Must not be null or empty.", "filePath"); }
             if (!File.Exists(filePath)) { return new FileNotFoundException(); }
             if (new FileInfo(filePath).Length > int.MaxValue) { return new ArgumentException("File is too large. Must be less than 2 GiB.", "filePath"); }
             if (internalBufferCapacity < 1024) { return new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024 bytes."); }
-
+            
             stream = File.OpenRead(filePath);
             Channel = channel;
 
@@ -380,10 +380,17 @@ namespace WavDotNet.Core
             if (bitDepth == 0) { return new UnrecognisedWavFileException("File is displaying an invalid bit depth."); }
             if (channels == 0) { return new UnrecognisedWavFileException("File is displaying an invalid number of channels."); }
             if (audioFormat == WavFormat.Unknown) { return new UnrecognisedWavFileException("Can only read audio in either PCM or IEEE format."); }
-            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
+            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64)
             {
                 return new UnrecognisedWavFileException("File is of an unsupported bit depth of:" + bitDepth + ".\nSupported bit depths: 8, 16, 24, 32 & 64.");
             }
+            var contains = false;
+            var channels = FindExistingChannels(speakerMask);
+            foreach (var ch in channels)
+            {
+                if (ch == Channel) { contains = true; break; }
+            }
+            if (!contains) { return new KeyNotFoundException("Stream/file does not contain channel: " + Channel.ToString() + "."); }
             
             return null;
         }
@@ -450,7 +457,7 @@ namespace WavDotNet.Core
 
                 default:
                 {
-                    throw new NotSupportedException("Can not read audio at bit depth of: " + bitDepth);
+                    throw new NotSupportedException("Cannot read audio at bit depth of: " + bitDepth);
                 }
             }
         }
