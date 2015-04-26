@@ -29,15 +29,25 @@ namespace WavDotNet.Core
     public class WavFileWrite<T> : WavFile, IDisposable
     {
         private readonly string filePath;
+        private Stream stream;
         private int headerSize;
         private bool flushed;
         private bool disposed;
-        private Stream stream;
 
+        /// <summary>
+        /// The IoPriority used while writing samples to the file/Stream.
+        /// </summary>
         public IoPriority WritePriority { get; set; }
 
+        /// <summary>
+        /// The (mutable) collection holding the audio data to be flushed.
+        /// (Edit this property as necessary to hold the data you wish to flush.)
+        /// </summary>
         public Collection<Channel<T>> AudioData { get; private set; }
 
+        /// <summary>
+        /// The total number of channels this object currently has.
+        /// </summary>
         public ushort ChannelCount
         {
             get
@@ -52,7 +62,12 @@ namespace WavDotNet.Core
 
         public WavFileWrite(string filePath, uint sampleRate, WavFormat format, ushort bitDepth, ushort validBits)
         {
-            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
+            var ex = InitialiseFromFile(filePath, sampleRate, format, bitDepth, validBits);
+            if (ex != null) { throw ex; }
+            
+            
+            
+            /*if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
             if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
             if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
             {
@@ -65,12 +80,17 @@ namespace WavDotNet.Core
             SampleRate = sampleRate;
             BitDepth = bitDepth;
             ValidBits = validBits;
-            AudioData = new Collection<Channel<T>>();
+            AudioData = new Collection<Channel<T>>();*/
         }
 
         public WavFileWrite(string filePath, uint sampleRate, WavFormat format, ushort bitDepth)
         {
-            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
+            var ex = InitialiseFromFile(filePath, sampleRate, format, bitDepth);
+            if (ex != null) { throw ex; }
+            
+            
+            
+            /*if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
             if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
             if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
             {
@@ -82,33 +102,48 @@ namespace WavDotNet.Core
             SampleRate = sampleRate;
             BitDepth = bitDepth;
             ValidBits = bitDepth;
-            AudioData = new Collection<Channel<T>>();
+            AudioData = new Collection<Channel<T>>();*/
         }
 
         public WavFileWrite(string filePath, uint sampleRate, WavFormat format)
         {
-            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
+            var ex = InitialiseFromFile(filePath, sampleRate, format);
+            if (ex != null) { throw ex; }
+            
+            
+            
+            /*if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
             if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
 
             this.filePath = filePath;
             Format = format;
             SampleRate = sampleRate;
-            AudioData = new Collection<Channel<T>>();
+            AudioData = new Collection<Channel<T>>();*/
         }
 
         public WavFileWrite(string filePath, uint sampleRate)
         {
-            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
+            var ex = InitialiseFromFile(filePath, sampleRate);
+            if (ex != null) { throw ex; }
+            
+            
+            
+            /*if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
             if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
 
             this.filePath = filePath;
             SampleRate = sampleRate;
-            AudioData = new Collection<Channel<T>>();
+            AudioData = new Collection<Channel<T>>();*/
         }
 
         public WavFileWrite(Stream stream, uint sampleRate, WavFormat format, ushort bitDepth, ushort validBits)
         {
-            if (stream == null) { throw new ArgumentNullException("stream"); }
+            var ex = InitialiseFromStream(stream, sampleRate, format, bitDepth, validBits);
+            if (ex != null) { throw ex; }
+            
+            
+            
+            /*if (stream == null) { throw new ArgumentNullException("stream"); }
             if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
             if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
             {
@@ -121,12 +156,17 @@ namespace WavDotNet.Core
             SampleRate = sampleRate;
             BitDepth = bitDepth;
             ValidBits = validBits;
-            AudioData = new Collection<Channel<T>>();
+            AudioData = new Collection<Channel<T>>();*/
         }
 
         public WavFileWrite(Stream stream, uint sampleRate, WavFormat format, ushort bitDepth)
         {
-            if (stream == null) { throw new ArgumentNullException("stream"); }
+            var ex = InitialiseFromStream(stream, sampleRate, format, bitDepth);
+            if (ex != null) { throw ex; }
+            
+            
+            
+            /*if (stream == null) { throw new ArgumentNullException("stream"); }
             if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
             if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
             {
@@ -138,28 +178,38 @@ namespace WavDotNet.Core
             SampleRate = sampleRate;
             BitDepth = bitDepth;
             ValidBits = bitDepth;
-            AudioData = new Collection<Channel<T>>();
+            AudioData = new Collection<Channel<T>>();*/
         }
 
         public WavFileWrite(Stream stream, uint sampleRate, WavFormat format)
         {
-            if (stream == null) { throw new ArgumentNullException("stream"); }
+            var ex = InitialiseFromStream(stream, sampleRate, format);
+            if (ex != null) { throw ex; }
+            
+            
+            
+            /*if (stream == null) { throw new ArgumentNullException("stream"); }
             if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
 
             this.stream = stream;
             Format = format;
             SampleRate = sampleRate;
-            AudioData = new Collection<Channel<T>>();
+            AudioData = new Collection<Channel<T>>();*/
         }
 
         public WavFileWrite(Stream stream, uint sampleRate)
         {
-            if (stream == null) { throw new ArgumentNullException("stream"); }
+            var ex = InitialiseFromStream(stream, sampleRate);
+            if (ex != null) { throw ex; }
+            
+            
+            
+            /*if (stream == null) { throw new ArgumentNullException("stream"); }
             if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
 
             this.stream = stream;
             SampleRate = sampleRate;
-            AudioData = new Collection<Channel<T>>();
+            AudioData = new Collection<Channel<T>>();*/
         }
 
         ~WavFileWrite()
@@ -217,6 +267,47 @@ namespace WavDotNet.Core
         }
 
 
+        # region Initialisation methods.
+
+        private Exception InitialiseFromFile(string filePath, uint sampleRate, WavFormat format = WavFormat.Unknown, ushort bitDepth = 0, ushort validBits = 0)
+        {
+            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Must not be null or empty.", "filePath"); }
+            if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Must not be 0."); }
+            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64)
+            {
+                return new ArgumentException("Can only be: 8, 16, 24, 32 or 64-bits.", "bitDepth");
+            }
+            if (validBits == 0) { throw new ArgumentOutOfRangeException("validBits", "Must not be 0."); }
+
+            this.filePath = filePath;
+            SampleRate = sampleRate;
+            AudioData = new Collection<Channel<T>>();
+            Format = format;
+            BitDepth = bitDepth;
+            ValidBits = validBits;
+        }
+        
+        private Exception InitialiseFromStream(Stream stream, uint sampleRate, WavFormat format = WavFromat.Unknown, ushort bitDepth = 0, ushort validBits = 0)
+        {
+            if (stream == null) { return new ArgumentNullException("stream"); }
+            if (sampleRate == 0) { return new ArgumentOutOfRangeException("sampleRate", "Must not be 0."); }
+            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64)
+            {
+                return new ArgumentException("Can only be: 8, 16, 24, 32 or 64-bits.", "bitDepth");
+            }
+            if (validBits == 0) { return new ArgumentOutOfRangeException("validBits", "Must not be 0."); }
+
+            this.stream = stream;
+            SampleRate = sampleRate;
+            AudioData = new Collection<Channel<T>>();
+            Format = format;
+            BitDepth = bitDepth;
+            ValidBits = validBits;
+            
+            return null;
+        }
+        
+        # endregion
 
         private static WavFormat GuessFormat()
         {
@@ -268,11 +359,6 @@ namespace WavDotNet.Core
                 }
 
                 case "System.Double":
-                {
-                    return WavFormat.FloatingPoint;
-                }
-
-                case "System.Decimal":
                 {
                     return WavFormat.FloatingPoint;
                 }
@@ -338,11 +424,6 @@ namespace WavDotNet.Core
                     return 64;
                 }
 
-                case "System.Decimal":
-                {
-                    return 128;
-                }
-
                 default:
                 {
                     throw new NotSupportedException();
@@ -393,7 +474,7 @@ namespace WavDotNet.Core
                     }
                 }
 
-                if (hasMono) { throw new InvalidWavDataException("'AudioData' can not contain a 'Mono' channel if multiple channels are present."); }
+                if (hasMono) { throw new InvalidWavDataException("'AudioData' must not contain a 'Mono' channel if multiple channels are present."); }
             }
 
             foreach (var pos in Enum.GetValues(typeof(ChannelPositions)))
@@ -408,7 +489,7 @@ namespace WavDotNet.Core
                     }
                 }
 
-                if (count > 1) { throw new InvalidWavDataException("'AudioData' can not contain multiple channels set with the same 'ChannelPosition'."); }
+                if (count > 1) { throw new InvalidWavDataException("'AudioData' must not contain multiple channels set with the same 'ChannelPosition'."); }
             }
         }
 
