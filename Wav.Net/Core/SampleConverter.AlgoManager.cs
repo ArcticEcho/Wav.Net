@@ -45,7 +45,7 @@ namespace WavDotNet.Core
             private delegate double GetDouble(TFrom sample);
             private delegate decimal GetDecimal(TFrom sample);
 
-            private readonly GetSByte getSByte = sample => (sbyte?)Convert.ChangeType(sample, typeof(sbyte), invCulture) ?? 0;
+            private readonly GetSByte getSByte = sample => (sbyte?)System.Convert.ChangeType(sample, typeof(sbyte), invCulture) ?? 0;
             private readonly GetByte getByte = sample => (byte?)Convert.ChangeType(sample, typeof(byte), invCulture) ?? 0;
             private readonly GetInt16 getInt16 = sample => (short?)Convert.ChangeType(sample, typeof(short), invCulture) ?? 0;
             private readonly GetUInt16 getUInt16 = sample => (ushort?)Convert.ChangeType(sample, typeof(ushort), invCulture) ?? 0;
