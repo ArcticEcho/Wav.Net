@@ -20,12 +20,15 @@
 
 namespace WavDotNet.Core
 {
-    public abstract class WavFile
+    public abstract class WavMeta
     {
         public uint SampleRate { get; protected set; }
-        public uint AudioLengthBytes { get; protected set; }
+        public ushort Channels { get; protected set; }
         public ushort BitDepth { get; protected set; }
-        public ushort ValidBits { get; protected set; }
         public WavFormat Format { get; protected set; }
+        public uint SpeakerMask { get; protected set; }
+        public ushort ValidBits { get; protected set; }
+        public uint AudioLengthBytes { get; protected set; }
+        public uint HeaderSize { get; protected set; }
     }
 }
