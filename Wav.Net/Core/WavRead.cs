@@ -307,7 +307,7 @@ namespace WavDotNet.Core
             }
             if (BitDepth < ValidBits)
             {
-                return new UnrecognisedWavFileException("File is displaying an invalid bit depth and/or invalid valid bits per sample. (The file is displaying a bit depth less than its vaild bits per sample field.)");
+                return new UnrecognisedWavFileException("File is displaying an invalid bit depth and/or invalid valid bits per sample. (The file is displaying a bit depth less than its valid bits per sample field.)");
             }
             
             return null;

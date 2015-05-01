@@ -44,6 +44,11 @@ namespace WavDotNet.Core
         public const uint DefaultBufferSize = 1048576;
 
         /// <summary>
+        /// The smallest permitted size for the internal buffer. Currently set to 4 KiB.
+        /// </summary>
+        public const uint MinimumBufferSize = 4096;
+
+        /// <summary>
         /// The duration (as a TimeSpan) of the audio.
         /// </summary>
         public TimeSpan Duration
@@ -248,7 +253,7 @@ namespace WavDotNet.Core
             if (String.IsNullOrEmpty(filePath)) { return new ArgumentException("Must not be null or empty.", "filePath"); }
             if (!File.Exists(filePath)) { return new FileNotFoundException(); }
             if (new FileInfo(filePath).Length > int.MaxValue) { return new ArgumentException("File is too large. Must be less than 2 GiB.", "filePath"); }
-            if (internalBufferCapacity < 1024) { return new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024 bytes."); }
+            if (internalBufferCapacity < MinimumBufferSize) { return new ArgumentOutOfRangeException("bufferCapacity", "Must be more than " + MinimumBufferSize + " bytes."); }
 
             stream = File.OpenRead(filePath);
             Channel = channel;
@@ -269,7 +274,7 @@ namespace WavDotNet.Core
             if (stream == null) { return new ArgumentNullException("stream"); }
             if (!stream.CanRead) { return new NotSupportedException("'stream' must be readable."); }
             if (stream.Length > int.MaxValue) { return new ArgumentException("Stream is too large. Must be less than 2GiB.", "stream"); }
-            if (internalBufferCapacity < 1024) { return new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024 bytes."); }
+            if (internalBufferCapacity < MinimumBufferSize) { return new ArgumentOutOfRangeException("bufferCapacity", "Must be more than " + MinimumBufferSize + " bytes."); }
 
             this.stream = stream;
             Channel = channel;

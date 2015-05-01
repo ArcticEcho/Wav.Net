@@ -25,20 +25,20 @@ using System.Text.RegularExpressions;
 
 namespace WavDotNet.Core
 {
+    /// <summary>
+    /// Represents an immutable class for accessing a generic collection of samples.
+    /// (Samples are not actually "stored" in this object, but are merely made accessible.
+    /// It may help to think of this class as a "bridge" to get to the samples passed via the constructor.) 
+    /// </summary>
+    /// <typeparam name="T">The type of the samples.</typeparam>
     public class Samples<T> : IEnumerable<T>
     {
-        private static readonly Regex typeCheck = new Regex(@"^System\.(U?Int\d{1,2}|S?Byte|Single|Double|Decimal)$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private static readonly Regex typeCheck = new Regex(@"^System\.(U?Int\d{1,2}|S?Byte|Single|Double)$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         private readonly GetSample sampleGetter;
-        private readonly SetSample sampleSetter;
-        private readonly AddSample sampleAdder;
-        private readonly RemoveSample sampleRemover;
         private readonly GetCount getCount;
 
         public delegate T GetSample(int index);
-        public delegate void SetSample(int index, T value);
-        public delegate void AddSample(T value);
-        public delegate void RemoveSample(int index);
         public delegate int GetCount();
 
         public Type SampleType
@@ -46,14 +46,6 @@ namespace WavDotNet.Core
             get
             {
                 return typeof(T);
-            }
-        }
-
-        public bool IsReadOnly
-        {
-            get
-            {
-                return sampleSetter == null;
             }
         }
 
@@ -71,16 +63,6 @@ namespace WavDotNet.Core
             {
                 return sampleGetter(index);
             }
-
-            set
-            {
-                if (sampleSetter != null)
-                {
-                    sampleSetter(index, value);
-                }
-
-                throw new ReadOnlyObjectException("This object is read-only.");
-            }
         }
 
 
@@ -93,12 +75,11 @@ namespace WavDotNet.Core
 
             if (!typeCheck.IsMatch(inTypeName))
             {
-                throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
+                throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float or double.");
             }
 
             getCount = () => samples.Length;
             sampleGetter = i => samples[i];
-            sampleSetter = (i, val) => samples[i] = val;
         }
 
         public Samples(IList<T> samples)
@@ -109,35 +90,11 @@ namespace WavDotNet.Core
 
             if (!typeCheck.IsMatch(inTypeName))
             {
-                throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
+                throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float or double.");
             }
 
             getCount = () => samples.Count;
             sampleGetter = i => samples[i];
-            sampleSetter = (i, val) => samples[i] = val;
-            sampleAdder = samples.Add;
-            sampleRemover = samples.RemoveAt;
-        }
-
-        public Samples(IList<T> samples, bool isReadOnly)
-        {
-            if (samples == null) { throw new ArgumentNullException("samples"); }
-
-            var inTypeName = typeof(T).FullName;
-
-            if (!typeCheck.IsMatch(inTypeName))
-            {
-                throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
-            }
-
-            getCount = () => samples.Count;
-            sampleGetter = i => samples[i];
-
-            if (isReadOnly) { return; }
-
-            sampleSetter = (i, val) => samples[i] = val;
-            sampleAdder = samples.Add;
-            sampleRemover = samples.RemoveAt;
         }
 
         public Samples(GetCount getCount, GetSample sampleGetter)
@@ -149,49 +106,14 @@ namespace WavDotNet.Core
 
             if (!typeCheck.IsMatch(inTypeName))
             {
-                throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
+                throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float or double.");
             }
 
             this.getCount = getCount;
             this.sampleGetter = sampleGetter;
         }
 
-        public Samples(GetCount getCount, GetSample sampleGetter, SetSample sampleSetter, AddSample sampleAdder, RemoveSample sampleRemover)
-        {
-            if (getCount == null) { throw new ArgumentNullException("getCount"); }
-            if (sampleGetter == null) { throw new ArgumentNullException("sampleGetter"); }
 
-            var inTypeName = typeof(T).FullName;
-
-            if (!typeCheck.IsMatch(inTypeName))
-            {
-                throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float, double or decimal.");
-            }
-
-            this.getCount = getCount;
-            this.sampleGetter = sampleGetter;
-            this.sampleSetter = sampleSetter;
-            this.sampleAdder = sampleAdder;
-            this.sampleRemover = sampleRemover;
-        }
-
-
-
-        public void Add(T sample)
-        {
-            if (IsReadOnly) { throw new ReadOnlyObjectException("This object is read-only."); }
-            if (sampleAdder == null) { throw new ReadOnlyObjectException("'sampleAdder' has not been specified."); }
-
-            sampleAdder(sample);
-        }
-
-        public void RemoveAt(int index)
-        {
-            if (IsReadOnly) { throw new ReadOnlyObjectException("This object is read-only."); }
-            if (sampleRemover == null) { throw new ReadOnlyObjectException("'sampleRemover' has not been specified."); }
-
-            sampleRemover(index);
-        }
 
         public IEnumerator<T> GetEnumerator()
         {

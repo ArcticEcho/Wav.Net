@@ -167,6 +167,7 @@ namespace WavDotNet.Core
         }
 
 
+
         # region Initialisation methods.
 
         private Exception InitialiseFromFile(string filePath, uint sampleRate, WavFormat format = WavFormat.Unknown, ushort bitDepth = 0, ushort validBits = 0)
@@ -185,7 +186,7 @@ namespace WavDotNet.Core
             Format = format;
             BitDepth = bitDepth;
             ValidBits = validBits;
-            
+
             return null;
         }
         
@@ -206,7 +207,7 @@ namespace WavDotNet.Core
             Format = format;
             BitDepth = bitDepth;
             ValidBits = validBits;
-            
+
             return null;
         }
         
@@ -454,7 +455,7 @@ namespace WavDotNet.Core
                 // Channel Mask (channel layout within file).
                 stream.Write(BitConverter.GetBytes(GetSpeakerMask()), 0, 4);
 
-                // GUID + Format. Format is either PCM or floating point. Anyother format indicates compression.
+                // GUID + Format. Format is either PCM or floating point. Any other format indicates compression.
                 stream.Write(guid.ToArray(), 0, 16);
             }
 
@@ -819,98 +820,6 @@ namespace WavDotNet.Core
 
         # endregion
 
-        # region Private 64-bit sample writing methods.
-
-        // TODO: Finish off refactoring/optimising 64-bit sample writing methods.
-
-        private void WriteSamples64Bit(Samples<T> samples)
-        {
-            if (Format == WavFormat.Pcm)
-            {
-                var converter = new SampleConverter<T, long>();
-
-                foreach (var sample in samples)
-                {
-                    stream.Write(BitConverter.GetBytes(converter.Convert(sample)), 0, 8);
-                }
-            }
-            else
-            {
-                var converter = new SampleConverter<T, double>();
-
-                foreach (var sample in samples)
-                {
-                    stream.Write(BitConverter.GetBytes(converter.Convert(sample)), 0, 8);
-                }
-            }
-        }
-
-        private void WriteSamples64BitNoConvert(Samples<T> samples)
-        {
-            if (WritePriority == IoPriority.Memory)
-            {
-                foreach (var sample in samples)
-                {
-                    var bytes = BitConverter.GetBytes(sample as long? ?? 0);
-                    stream.Write(bytes, 0, 8);
-                }
-            }
-            else
-            {
-                var data = new byte[samples.Count * 8];
-
-                for (var i = 0; i < data.Length; i += 8)
-                {
-                    var bytes = BitConverter.GetBytes(samples[i / 8] as long? ?? 0);
-                    data[i] = bytes[0];
-                    data[i + 1] = bytes[1];
-                    data[i + 2] = bytes[2];
-                    data[i + 3] = bytes[3];
-                    data[i + 1] = bytes[4];
-                    data[i + 2] = bytes[5];
-                    data[i + 3] = bytes[6];
-                    data[i + 3] = bytes[7];
-                }
-
-                stream.Write(data, 0, data.Length);
-            }
-        }
-
-        private void WriteSamples64BitConvert(Samples<T> samples)
-        {
-            var converter = new SampleConverter<T, long>();
-
-            if (WritePriority == IoPriority.Memory)
-            {
-                foreach (var sample in samples)
-                {
-                    var bytes = BitConverter.GetBytes(converter.Convert(sample));
-                    stream.Write(bytes, 0, 8);
-                }
-            }
-            else
-            {
-                var data = new byte[samples.Count * 8];
-
-                for (var i = 0; i < data.Length; i += 8)
-                {
-                    var bytes = BitConverter.GetBytes(converter.Convert(samples[i / 8]));
-                    data[i] = bytes[0];
-                    data[i + 1] = bytes[1];
-                    data[i + 2] = bytes[2];
-                    data[i + 3] = bytes[3];
-                    data[i + 1] = bytes[4];
-                    data[i + 2] = bytes[5];
-                    data[i + 3] = bytes[6];
-                    data[i + 3] = bytes[7];
-                }
-
-                stream.Write(data, 0, data.Length);
-            }
-        }
-
-        # endregion
-
         # region Private float writing methods.
 
         private void WriteAsFloats(Samples<T> samples)
@@ -983,6 +892,164 @@ namespace WavDotNet.Core
 
         # endregion
 
+        # region Private 64-bit sample writing methods.
+
+        private void WriteSamples64Bit(Samples<T> samples)
+        {
+            if (Format == WavFormat.Pcm)
+            {
+                if (typeof(T) == typeof(long))
+                {
+                    WriteSamplesPcm64BitNoConvert(samples);
+                }
+                else
+                {
+                    WriteSamplesPcm64BitConvert(samples);
+                }
+            }
+            else
+            {
+                if (typeof(T) == typeof(double))
+                {
+                    WriteSamplesIeee64BitNoConvert(samples);
+                }
+                else
+                {
+                    WriteSamplesIeee64BitConvert(samples);
+                }
+            }
+        }
+
+        private void WriteSamplesIeee64BitNoConvert(Samples<T> samples)
+        {
+            if (WritePriority == IoPriority.Memory)
+            {
+                foreach (var sample in samples)
+                {
+                    var bytes = BitConverter.GetBytes(sample as double? ?? 0);
+                    stream.Write(bytes, 0, 8);
+                }
+            }
+            else
+            {
+                var data = new byte[samples.Count * 8];
+
+                for (var i = 0; i < data.Length; i += 8)
+                {
+                    var bytes = BitConverter.GetBytes(samples[i / 8] as double? ?? 0);
+                    data[i] = bytes[0];
+                    data[i + 1] = bytes[1];
+                    data[i + 2] = bytes[2];
+                    data[i + 3] = bytes[3];
+                    data[i + 1] = bytes[4];
+                    data[i + 2] = bytes[5];
+                    data[i + 3] = bytes[6];
+                    data[i + 3] = bytes[7];
+                }
+
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        private void WriteSamplesIeee64BitConvert(Samples<T> samples)
+        {
+            var converter = new SampleConverter<T, double>();
+
+            if (WritePriority == IoPriority.Memory)
+            {
+                foreach (var sample in samples)
+                {
+                    var bytes = BitConverter.GetBytes(converter.Convert(sample));
+                    stream.Write(bytes, 0, 8);
+                }
+            }
+            else
+            {
+                var data = new byte[samples.Count * 8];
+
+                for (var i = 0; i < data.Length; i += 8)
+                {
+                    var bytes = BitConverter.GetBytes(converter.Convert(samples[i / 8]));
+                    data[i] = bytes[0];
+                    data[i + 1] = bytes[1];
+                    data[i + 2] = bytes[2];
+                    data[i + 3] = bytes[3];
+                    data[i + 1] = bytes[4];
+                    data[i + 2] = bytes[5];
+                    data[i + 3] = bytes[6];
+                    data[i + 3] = bytes[7];
+                }
+
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        private void WriteSamplesPcm64BitNoConvert(Samples<T> samples)
+        {
+            if (WritePriority == IoPriority.Memory)
+            {
+                foreach (var sample in samples)
+                {
+                    var bytes = BitConverter.GetBytes(sample as long? ?? 0);
+                    stream.Write(bytes, 0, 8);
+                }
+            }
+            else
+            {
+                var data = new byte[samples.Count * 8];
+
+                for (var i = 0; i < data.Length; i += 8)
+                {
+                    var bytes = BitConverter.GetBytes(samples[i / 8] as long? ?? 0);
+                    data[i] = bytes[0];
+                    data[i + 1] = bytes[1];
+                    data[i + 2] = bytes[2];
+                    data[i + 3] = bytes[3];
+                    data[i + 1] = bytes[4];
+                    data[i + 2] = bytes[5];
+                    data[i + 3] = bytes[6];
+                    data[i + 3] = bytes[7];
+                }
+
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        private void WriteSamplesPcm64BitConvert(Samples<T> samples)
+        {
+            var converter = new SampleConverter<T, long>();
+
+            if (WritePriority == IoPriority.Memory)
+            {
+                foreach (var sample in samples)
+                {
+                    var bytes = BitConverter.GetBytes(converter.Convert(sample));
+                    stream.Write(bytes, 0, 8);
+                }
+            }
+            else
+            {
+                var data = new byte[samples.Count * 8];
+
+                for (var i = 0; i < data.Length; i += 8)
+                {
+                    var bytes = BitConverter.GetBytes(converter.Convert(samples[i / 8]));
+                    data[i] = bytes[0];
+                    data[i + 1] = bytes[1];
+                    data[i + 2] = bytes[2];
+                    data[i + 3] = bytes[3];
+                    data[i + 1] = bytes[4];
+                    data[i + 2] = bytes[5];
+                    data[i + 3] = bytes[6];
+                    data[i + 3] = bytes[7];
+                }
+
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        # endregion
+
         private uint GetSpeakerMask()
         {
             uint mask = 0;
@@ -1016,7 +1083,7 @@ namespace WavDotNet.Core
                     totalSampleCount = k;
                 }
             }
-            
+
             totalSampleCount *= AudioData.Count;
 
             for (var i = 0; i < totalSampleCount; i += AudioData.Count) // Jump every frame.
@@ -1036,20 +1103,13 @@ namespace WavDotNet.Core
 
             foreach (var ch in AudioData)
             {
-                if (sorted.Count == 0)
+                if (ch.Position > AudioData[0].Position || sorted.Count == 0)
                 {
                     sorted.Add(ch.Samples);
                 }
                 else
                 {
-                    if (ch.Position > AudioData[0].Position)
-                    {
-                        sorted.Add(ch.Samples);
-                    }
-                    else
-                    {
-                        sorted.Insert(0, ch.Samples);
-                    }
+                    sorted.Insert(0, ch.Samples);
                 }
             }
 
