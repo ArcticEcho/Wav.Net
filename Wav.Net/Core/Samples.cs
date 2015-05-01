@@ -34,11 +34,11 @@ namespace WavDotNet.Core
     public class Samples<T> : IEnumerable<T>
     {
         private static readonly Regex typeCheck = new Regex(@"^System\.(U?Int\d{1,2}|S?Byte|Single|Double)$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
-        private readonly GetSample sampleGetter;
+        private readonly IEnumerator sampleEnumerator;
+        private readonly SampleIndexer sampleIndexer;
         private readonly GetCount getCount;
 
-        public delegate T GetSample(int index);
+        public delegate T SampleIndexer(int index);
         public delegate int GetCount();
 
         public Type SampleType
@@ -61,7 +61,7 @@ namespace WavDotNet.Core
         {
             get
             {
-                return sampleGetter(index);
+                return sampleIndexer(index);
             }
         }
 
@@ -79,7 +79,8 @@ namespace WavDotNet.Core
             }
 
             getCount = () => samples.Length;
-            sampleGetter = i => samples[i];
+            sampleIndexer = i => samples[i];
+            sampleEnumerator = samples.GetEnumerator();
         }
 
         public Samples(IList<T> samples)
@@ -94,13 +95,44 @@ namespace WavDotNet.Core
             }
 
             getCount = () => samples.Count;
-            sampleGetter = i => samples[i];
+            sampleIndexer = i => samples[i];
+            sampleEnumerator = samples.GetEnumerator();
         }
 
-        public Samples(GetCount getCount, GetSample sampleGetter)
+        public Samples(IEnumerable<T> samples)
+        {
+            if (samples == null) { throw new ArgumentNullException("samples"); }
+
+            var inTypeName = typeof(T).FullName;
+
+            if (!typeCheck.IsMatch(inTypeName))
+            {
+                throw new Exception("T can only be of type: byte, sbyte, short, ushort, int, uint, long, ulong, float or double.");
+            }
+
+            var count = 0;
+            using (var enumerator = samples.GetEnumerator()) { while (enumerator.MoveNext()) { count++; } }
+
+            getCount = () => count;
+            sampleIndexer = i =>
+            {
+                var curInd = 0;
+                foreach (var sam in samples)
+                {
+                    if (i == curInd) { return sam; }
+                    curInd++;
+                }
+
+                throw new IndexOutOfRangeException();
+            };
+            sampleEnumerator = samples.GetEnumerator();
+        }
+
+        public Samples(GetCount getCount, SampleIndexer sampleIndexer, IEnumerator enumerator)
         {
             if (getCount == null) { throw new ArgumentNullException("getCount"); }
-            if (sampleGetter == null) { throw new ArgumentNullException("sampleGetter"); }
+            if (sampleIndexer == null) { throw new ArgumentNullException("sampleIndexer"); }
+            if (enumerator == null) { throw new ArgumentNullException("enumerator"); }
 
             var inTypeName = typeof(T).FullName;
 
@@ -110,16 +142,21 @@ namespace WavDotNet.Core
             }
 
             this.getCount = getCount;
-            this.sampleGetter = sampleGetter;
+            this.sampleIndexer = sampleIndexer;
+            sampleEnumerator = enumerator;
         }
 
 
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (var i = 0; i < Count; i++)
+            if (!sampleEnumerator.MoveNext()) { throw new Exception("Unable to enumerate collection."); }
+
+            yield return (T)sampleEnumerator.Current;
+
+            while (sampleEnumerator.MoveNext())
             {
-                yield return this[i];
+                yield return (T)sampleEnumerator.Current;
             }
         }
 
