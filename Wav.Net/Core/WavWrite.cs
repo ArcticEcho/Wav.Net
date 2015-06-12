@@ -310,12 +310,12 @@ namespace WavDotNet.Core
 
                 case "System.Int64":
                 {
-                    return 32;
+                    return 64;
                 }
 
                 case "System.UInt64":
                 {
-                    return 32;
+                    return 64;
                 }
 
                 case "System.Single":
