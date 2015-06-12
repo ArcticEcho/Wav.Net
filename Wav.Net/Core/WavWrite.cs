@@ -393,7 +393,7 @@ namespace WavDotNet.Core
                     }
                 }
 
-                if (count > 1) { throw new InvalidWavDataException("'AudioData' must not contain multiple channels set with the same 'ChannelPosition'."); }
+                if (count > 1) { throw new InvalidWavDataException("'AudioData' must not contain multiple channels set to the same 'ChannelPosition'."); }
             }
         }
 
@@ -920,70 +920,6 @@ namespace WavDotNet.Core
             }
         }
 
-        private void WriteSamplesIeee64BitNoConvert(Samples<T> samples)
-        {
-            if (WritePriority == IoPriority.Memory)
-            {
-                foreach (var sample in samples)
-                {
-                    var bytes = BitConverter.GetBytes(sample as double? ?? 0);
-                    stream.Write(bytes, 0, 8);
-                }
-            }
-            else
-            {
-                var data = new byte[samples.Count * 8];
-
-                for (var i = 0; i < data.Length; i += 8)
-                {
-                    var bytes = BitConverter.GetBytes(samples[i / 8] as double? ?? 0);
-                    data[i] = bytes[0];
-                    data[i + 1] = bytes[1];
-                    data[i + 2] = bytes[2];
-                    data[i + 3] = bytes[3];
-                    data[i + 1] = bytes[4];
-                    data[i + 2] = bytes[5];
-                    data[i + 3] = bytes[6];
-                    data[i + 3] = bytes[7];
-                }
-
-                stream.Write(data, 0, data.Length);
-            }
-        }
-
-        private void WriteSamplesIeee64BitConvert(Samples<T> samples)
-        {
-            var converter = new SampleConverter<T, double>();
-
-            if (WritePriority == IoPriority.Memory)
-            {
-                foreach (var sample in samples)
-                {
-                    var bytes = BitConverter.GetBytes(converter.Convert(sample));
-                    stream.Write(bytes, 0, 8);
-                }
-            }
-            else
-            {
-                var data = new byte[samples.Count * 8];
-
-                for (var i = 0; i < data.Length; i += 8)
-                {
-                    var bytes = BitConverter.GetBytes(converter.Convert(samples[i / 8]));
-                    data[i] = bytes[0];
-                    data[i + 1] = bytes[1];
-                    data[i + 2] = bytes[2];
-                    data[i + 3] = bytes[3];
-                    data[i + 1] = bytes[4];
-                    data[i + 2] = bytes[5];
-                    data[i + 3] = bytes[6];
-                    data[i + 3] = bytes[7];
-                }
-
-                stream.Write(data, 0, data.Length);
-            }
-        }
-
         private void WriteSamplesPcm64BitNoConvert(Samples<T> samples)
         {
             if (WritePriority == IoPriority.Memory)
@@ -1005,10 +941,10 @@ namespace WavDotNet.Core
                     data[i + 1] = bytes[1];
                     data[i + 2] = bytes[2];
                     data[i + 3] = bytes[3];
-                    data[i + 1] = bytes[4];
-                    data[i + 2] = bytes[5];
-                    data[i + 3] = bytes[6];
-                    data[i + 3] = bytes[7];
+                    data[i + 4] = bytes[4];
+                    data[i + 5] = bytes[5];
+                    data[i + 6] = bytes[6];
+                    data[i + 7] = bytes[7];
                 }
 
                 stream.Write(data, 0, data.Length);
@@ -1038,10 +974,74 @@ namespace WavDotNet.Core
                     data[i + 1] = bytes[1];
                     data[i + 2] = bytes[2];
                     data[i + 3] = bytes[3];
-                    data[i + 1] = bytes[4];
-                    data[i + 2] = bytes[5];
-                    data[i + 3] = bytes[6];
-                    data[i + 3] = bytes[7];
+                    data[i + 4] = bytes[4];
+                    data[i + 5] = bytes[5];
+                    data[i + 6] = bytes[6];
+                    data[i + 7] = bytes[7];
+                }
+
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        private void WriteSamplesIeee64BitNoConvert(Samples<T> samples)
+        {
+            if (WritePriority == IoPriority.Memory)
+            {
+                foreach (var sample in samples)
+                {
+                    var bytes = BitConverter.GetBytes(sample as double? ?? 0);
+                    stream.Write(bytes, 0, 8);
+                }
+            }
+            else
+            {
+                var data = new byte[samples.Count * 8];
+
+                for (var i = 0; i < data.Length; i += 8)
+                {
+                    var bytes = BitConverter.GetBytes(samples[i / 8] as double? ?? 0);
+                    data[i] = bytes[0];
+                    data[i + 1] = bytes[1];
+                    data[i + 2] = bytes[2];
+                    data[i + 3] = bytes[3];
+                    data[i + 4] = bytes[4];
+                    data[i + 5] = bytes[5];
+                    data[i + 6] = bytes[6];
+                    data[i + 7] = bytes[7];
+                }
+
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        private void WriteSamplesIeee64BitConvert(Samples<T> samples)
+        {
+            var converter = new SampleConverter<T, double>();
+
+            if (WritePriority == IoPriority.Memory)
+            {
+                foreach (var sample in samples)
+                {
+                    var bytes = BitConverter.GetBytes(converter.Convert(sample));
+                    stream.Write(bytes, 0, 8);
+                }
+            }
+            else
+            {
+                var data = new byte[samples.Count * 8];
+
+                for (var i = 0; i < data.Length; i += 8)
+                {
+                    var bytes = BitConverter.GetBytes(converter.Convert(samples[i / 8]));
+                    data[i] = bytes[0];
+                    data[i + 1] = bytes[1];
+                    data[i + 2] = bytes[2];
+                    data[i + 3] = bytes[3];
+                    data[i + 4] = bytes[4];
+                    data[i + 5] = bytes[5];
+                    data[i + 6] = bytes[6];
+                    data[i + 7] = bytes[7];
                 }
 
                 stream.Write(data, 0, data.Length);
