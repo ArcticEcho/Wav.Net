@@ -29,7 +29,7 @@ namespace WavDotNet.Core
     /// <summary>
     /// Represents a class for gathering data (meta-data and actual audio data) from a .wav file/Stream.
     /// </summary>
-    /// <typeparam name="T">The type of which all samples should be (converted if necessary, and) returned as.</typeparam>
+    /// <typeparam name="T">The type of which all samples should be (normalised if necessary, and) returned as.</typeparam>
     public class WavRead<T> : WavMeta, IDisposable, IEnumerable<SampleReader<T>>
     {
         private Stream stream;

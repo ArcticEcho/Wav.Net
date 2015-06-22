@@ -30,7 +30,7 @@ namespace WavDotNet.Core
     /// <summary>
     /// Represents a class for dynamically reading samples of a single channel from a Stream or file.
     /// </summary>
-    /// <typeparam name="T">The type of the samples to be returned (when read). (Samples are automatically converted to type T if they are not already of that type.)</typeparam>
+    /// <typeparam name="T">The type of the samples to be returned (when read). (Samples are automatically normalised if necessary.)</typeparam>
     public class SampleReader<T> : WavMeta, IDisposable, IEnumerable<T>
     {
         private bool disposed;
@@ -424,9 +424,9 @@ namespace WavDotNet.Core
 
             Marshal.FreeHGlobal((IntPtr)bytes);
 
-            var realSamples = new SampleConverter<byte, T>().Convert(samples);
+            var reqSams = new SampleConverter<byte, T>().Convert(samples);
 
-            return new Samples<T>(realSamples);
+            return new Samples<T>(reqSams);
         }
 
         private unsafe Samples<T> Read16BitSamples(uint sampleStartIndex, uint sampleEndIndex)
