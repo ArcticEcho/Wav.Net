@@ -26,18 +26,32 @@ using System.Text;
 
 namespace WavDotNet.Core
 {
-    public class WavFileWrite<T> : WavFile, IDisposable
+    /// <summary>
+    /// Represents a class for writing meta-data and actual audio data to a file/Stream.
+    /// </summary>
+    /// <typeparam name="T">The type of which all samples will be (converted if necessary, and) flushed as.</typeparam>
+    public class WavWrite<T> : WavMeta, IDisposable
     {
-        private readonly string filePath;
+        private string filePath;
+        private Stream stream;
         private int headerSize;
         private bool flushed;
         private bool disposed;
-        private Stream stream;
 
+        /// <summary>
+        /// The IoPriority used while writing samples to the file/Stream.
+        /// </summary>
         public IoPriority WritePriority { get; set; }
 
+        /// <summary>
+        /// The (mutable) collection holding the audio data to be flushed.
+        /// (Edit this property as necessary to hold the data you wish to flush.)
+        /// </summary>
         public Collection<Channel<T>> AudioData { get; private set; }
 
+        /// <summary>
+        /// The total number of channels this object currently has.
+        /// </summary>
         public ushort ChannelCount
         {
             get
@@ -50,119 +64,55 @@ namespace WavDotNet.Core
 
         # region Constructors/destructor.
 
-        public WavFileWrite(string filePath, uint sampleRate, WavFormat format, ushort bitDepth, ushort validBits)
+        public WavWrite(string filePath, uint sampleRate, WavFormat format, ushort bitDepth, ushort validBits)
         {
-            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
-            if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
-            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
-            {
-                throw new ArgumentException("Can only be: 8, 16, 24, 32 64 or 128.", "bitDepth");
-            }
-            if (validBits == 0) { throw new ArgumentOutOfRangeException("validBits", "Can not be 0."); }
-
-            this.filePath = filePath;
-            Format = format;
-            SampleRate = sampleRate;
-            BitDepth = bitDepth;
-            ValidBits = validBits;
-            AudioData = new Collection<Channel<T>>();
+            var ex = InitialiseFromFile(filePath, sampleRate, format, bitDepth, validBits);
+            if (ex != null) { throw ex; }
         }
 
-        public WavFileWrite(string filePath, uint sampleRate, WavFormat format, ushort bitDepth)
+        public WavWrite(string filePath, uint sampleRate, WavFormat format, ushort bitDepth)
         {
-            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
-            if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
-            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
-            {
-                throw new ArgumentException("Can only be: 8, 16, 24, 32 64 or 128.", "bitDepth");
-            }
-
-            this.filePath = filePath;
-            Format = format;
-            SampleRate = sampleRate;
-            BitDepth = bitDepth;
-            ValidBits = bitDepth;
-            AudioData = new Collection<Channel<T>>();
+            var ex = InitialiseFromFile(filePath, sampleRate, format, bitDepth);
+            if (ex != null) { throw ex; }
         }
 
-        public WavFileWrite(string filePath, uint sampleRate, WavFormat format)
+        public WavWrite(string filePath, uint sampleRate, WavFormat format)
         {
-            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
-            if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
-
-            this.filePath = filePath;
-            Format = format;
-            SampleRate = sampleRate;
-            AudioData = new Collection<Channel<T>>();
+            var ex = InitialiseFromFile(filePath, sampleRate, format);
+            if (ex != null) { throw ex; }
         }
 
-        public WavFileWrite(string filePath, uint sampleRate)
+        public WavWrite(string filePath, uint sampleRate)
         {
-            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
-            if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
-
-            this.filePath = filePath;
-            SampleRate = sampleRate;
-            AudioData = new Collection<Channel<T>>();
+            var ex = InitialiseFromFile(filePath, sampleRate);
+            if (ex != null) { throw ex; }
         }
 
-        public WavFileWrite(Stream stream, uint sampleRate, WavFormat format, ushort bitDepth, ushort validBits)
+        public WavWrite(Stream stream, uint sampleRate, WavFormat format, ushort bitDepth, ushort validBits)
         {
-            if (stream == null) { throw new ArgumentNullException("stream"); }
-            if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
-            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
-            {
-                throw new ArgumentException("Can only be: 8, 16, 24, 32 64 or 128.", "bitDepth");
-            }
-            if (validBits == 0) { throw new ArgumentOutOfRangeException("validBits", "Can not be 0."); }
-
-            this.stream = stream;
-            Format = format;
-            SampleRate = sampleRate;
-            BitDepth = bitDepth;
-            ValidBits = validBits;
-            AudioData = new Collection<Channel<T>>();
+            var ex = InitialiseFromStream(stream, sampleRate, format, bitDepth, validBits);
+            if (ex != null) { throw ex; }
         }
 
-        public WavFileWrite(Stream stream, uint sampleRate, WavFormat format, ushort bitDepth)
+        public WavWrite(Stream stream, uint sampleRate, WavFormat format, ushort bitDepth)
         {
-            if (stream == null) { throw new ArgumentNullException("stream"); }
-            if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
-            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
-            {
-                throw new ArgumentException("Can only be: 8, 16, 24, 32 64 or 128.", "bitDepth");
-            }
-
-            this.stream = stream;
-            Format = format;
-            SampleRate = sampleRate;
-            BitDepth = bitDepth;
-            ValidBits = bitDepth;
-            AudioData = new Collection<Channel<T>>();
+            var ex = InitialiseFromStream(stream, sampleRate, format, bitDepth);
+            if (ex != null) { throw ex; }
         }
 
-        public WavFileWrite(Stream stream, uint sampleRate, WavFormat format)
+        public WavWrite(Stream stream, uint sampleRate, WavFormat format)
         {
-            if (stream == null) { throw new ArgumentNullException("stream"); }
-            if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
-
-            this.stream = stream;
-            Format = format;
-            SampleRate = sampleRate;
-            AudioData = new Collection<Channel<T>>();
+            var ex = InitialiseFromStream(stream, sampleRate, format);
+            if (ex != null) { throw ex; }
         }
 
-        public WavFileWrite(Stream stream, uint sampleRate)
+        public WavWrite(Stream stream, uint sampleRate)
         {
-            if (stream == null) { throw new ArgumentNullException("stream"); }
-            if (sampleRate == 0) { throw new ArgumentOutOfRangeException("sampleRate", "Can not be 0."); }
-
-            this.stream = stream;
-            SampleRate = sampleRate;
-            AudioData = new Collection<Channel<T>>();
+            var ex = InitialiseFromStream(stream, sampleRate);
+            if (ex != null) { throw ex; }
         }
 
-        ~WavFileWrite()
+        ~WavWrite()
         {
             if (!disposed)
             {
@@ -218,6 +168,51 @@ namespace WavDotNet.Core
 
 
 
+        # region Initialisation methods.
+
+        private Exception InitialiseFromFile(string filePath, uint sampleRate, WavFormat format = WavFormat.Unknown, ushort bitDepth = 0, ushort validBits = 0)
+        {
+            if (String.IsNullOrEmpty(filePath)) { return new ArgumentException("Must not be null or empty.", "filePath"); }
+            if (sampleRate == 0) { return new ArgumentOutOfRangeException("sampleRate", "Must not be 0."); }
+            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64)
+            {
+                return new ArgumentException("Can only be: 8, 16, 24, 32 or 64-bits.", "bitDepth");
+            }
+            if (validBits == 0) { return new ArgumentOutOfRangeException("validBits", "Must not be 0."); }
+
+            this.filePath = filePath;
+            SampleRate = sampleRate;
+            AudioData = new Collection<Channel<T>>();
+            Format = format;
+            BitDepth = bitDepth;
+            ValidBits = validBits;
+
+            return null;
+        }
+        
+        private Exception InitialiseFromStream(Stream stream, uint sampleRate, WavFormat format = WavFormat.Unknown, ushort bitDepth = 0, ushort validBits = 0)
+        {
+            if (stream == null) { return new ArgumentNullException("stream"); }
+            if (!stream.CanWrite) { return new NotSupportedException("'stream' must be writable."); }
+            if (sampleRate == 0) { return new ArgumentOutOfRangeException("sampleRate", "Must not be 0."); }
+            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64)
+            {
+                return new ArgumentException("Can only be: 8, 16, 24, 32 or 64-bits.", "bitDepth");
+            }
+            if (validBits == 0) { return new ArgumentOutOfRangeException("validBits", "Must not be 0."); }
+
+            this.stream = stream;
+            SampleRate = sampleRate;
+            AudioData = new Collection<Channel<T>>();
+            Format = format;
+            BitDepth = bitDepth;
+            ValidBits = validBits;
+
+            return null;
+        }
+        
+        # endregion
+
         private static WavFormat GuessFormat()
         {
             switch (typeof(T).FullName)
@@ -272,11 +267,6 @@ namespace WavDotNet.Core
                     return WavFormat.FloatingPoint;
                 }
 
-                case "System.Decimal":
-                {
-                    return WavFormat.FloatingPoint;
-                }
-
                 default:
                 {
                     throw new NotSupportedException();
@@ -320,12 +310,12 @@ namespace WavDotNet.Core
 
                 case "System.Int64":
                 {
-                    return 32;
+                    return 64;
                 }
 
                 case "System.UInt64":
                 {
-                    return 32;
+                    return 64;
                 }
 
                 case "System.Single":
@@ -336,11 +326,6 @@ namespace WavDotNet.Core
                 case "System.Double":
                 {
                     return 64;
-                }
-
-                case "System.Decimal":
-                {
-                    return 128;
                 }
 
                 default:
@@ -370,7 +355,7 @@ namespace WavDotNet.Core
         {
             if (AudioData.Count == 0)
             {
-                throw new InvalidWavDataException("'AudioData' can not be empty.");
+                throw new InvalidWavDataException("'AudioData' must not be empty.");
             }
 
             foreach (var ch in AudioData)
@@ -393,7 +378,7 @@ namespace WavDotNet.Core
                     }
                 }
 
-                if (hasMono) { throw new InvalidWavDataException("'AudioData' can not contain a 'Mono' channel if multiple channels are present."); }
+                if (hasMono) { throw new InvalidWavDataException("'AudioData' must not contain a 'Mono' channel if multiple channels are present."); }
             }
 
             foreach (var pos in Enum.GetValues(typeof(ChannelPositions)))
@@ -408,7 +393,7 @@ namespace WavDotNet.Core
                     }
                 }
 
-                if (count > 1) { throw new InvalidWavDataException("'AudioData' can not contain multiple channels set with the same 'ChannelPosition'."); }
+                if (count > 1) { throw new InvalidWavDataException("'AudioData' must not contain multiple channels set to the same 'ChannelPosition'."); }
             }
         }
 
@@ -470,7 +455,7 @@ namespace WavDotNet.Core
                 // Channel Mask (channel layout within file).
                 stream.Write(BitConverter.GetBytes(GetSpeakerMask()), 0, 4);
 
-                // GUID + Format. Format is either PCM or floating point. Anyother format indicates compression.
+                // GUID + Format. Format is either PCM or floating point. Any other format indicates compression.
                 stream.Write(guid.ToArray(), 0, 16);
             }
 
@@ -835,98 +820,6 @@ namespace WavDotNet.Core
 
         # endregion
 
-        # region Private 64-bit sample writing methods.
-
-        // TODO: Finish off refactoring/optimising 64-bit sample writing methods.
-
-        private void WriteSamples64Bit(Samples<T> samples)
-        {
-            if (Format == WavFormat.Pcm)
-            {
-                var converter = new SampleConverter<T, long>();
-
-                foreach (var sample in samples)
-                {
-                    stream.Write(BitConverter.GetBytes(converter.Convert(sample)), 0, 8);
-                }
-            }
-            else
-            {
-                var converter = new SampleConverter<T, double>();
-
-                foreach (var sample in samples)
-                {
-                    stream.Write(BitConverter.GetBytes(converter.Convert(sample)), 0, 8);
-                }
-            }
-        }
-
-        private void WriteSamples64BitNoConvert(Samples<T> samples)
-        {
-            if (WritePriority == IoPriority.Memory)
-            {
-                foreach (var sample in samples)
-                {
-                    var bytes = BitConverter.GetBytes(sample as long? ?? 0);
-                    stream.Write(bytes, 0, 8);
-                }
-            }
-            else
-            {
-                var data = new byte[samples.Count * 8];
-
-                for (var i = 0; i < data.Length; i += 8)
-                {
-                    var bytes = BitConverter.GetBytes(samples[i / 8] as long? ?? 0);
-                    data[i] = bytes[0];
-                    data[i + 1] = bytes[1];
-                    data[i + 2] = bytes[2];
-                    data[i + 3] = bytes[3];
-                    data[i + 1] = bytes[4];
-                    data[i + 2] = bytes[5];
-                    data[i + 3] = bytes[6];
-                    data[i + 3] = bytes[7];
-                }
-
-                stream.Write(data, 0, data.Length);
-            }
-        }
-
-        private void WriteSamples64BitConvert(Samples<T> samples)
-        {
-            var converter = new SampleConverter<T, long>();
-
-            if (WritePriority == IoPriority.Memory)
-            {
-                foreach (var sample in samples)
-                {
-                    var bytes = BitConverter.GetBytes(converter.Convert(sample));
-                    stream.Write(bytes, 0, 8);
-                }
-            }
-            else
-            {
-                var data = new byte[samples.Count * 8];
-
-                for (var i = 0; i < data.Length; i += 8)
-                {
-                    var bytes = BitConverter.GetBytes(converter.Convert(samples[i / 8]));
-                    data[i] = bytes[0];
-                    data[i + 1] = bytes[1];
-                    data[i + 2] = bytes[2];
-                    data[i + 3] = bytes[3];
-                    data[i + 1] = bytes[4];
-                    data[i + 2] = bytes[5];
-                    data[i + 3] = bytes[6];
-                    data[i + 3] = bytes[7];
-                }
-
-                stream.Write(data, 0, data.Length);
-            }
-        }
-
-        # endregion
-
         # region Private float writing methods.
 
         private void WriteAsFloats(Samples<T> samples)
@@ -999,6 +892,164 @@ namespace WavDotNet.Core
 
         # endregion
 
+        # region Private 64-bit sample writing methods.
+
+        private void WriteSamples64Bit(Samples<T> samples)
+        {
+            if (Format == WavFormat.Pcm)
+            {
+                if (typeof(T) == typeof(long))
+                {
+                    WriteSamplesPcm64BitNoConvert(samples);
+                }
+                else
+                {
+                    WriteSamplesPcm64BitConvert(samples);
+                }
+            }
+            else
+            {
+                if (typeof(T) == typeof(double))
+                {
+                    WriteSamplesIeee64BitNoConvert(samples);
+                }
+                else
+                {
+                    WriteSamplesIeee64BitConvert(samples);
+                }
+            }
+        }
+
+        private void WriteSamplesPcm64BitNoConvert(Samples<T> samples)
+        {
+            if (WritePriority == IoPriority.Memory)
+            {
+                foreach (var sample in samples)
+                {
+                    var bytes = BitConverter.GetBytes(sample as long? ?? 0);
+                    stream.Write(bytes, 0, 8);
+                }
+            }
+            else
+            {
+                var data = new byte[samples.Count * 8];
+
+                for (var i = 0; i < data.Length; i += 8)
+                {
+                    var bytes = BitConverter.GetBytes(samples[i / 8] as long? ?? 0);
+                    data[i] = bytes[0];
+                    data[i + 1] = bytes[1];
+                    data[i + 2] = bytes[2];
+                    data[i + 3] = bytes[3];
+                    data[i + 4] = bytes[4];
+                    data[i + 5] = bytes[5];
+                    data[i + 6] = bytes[6];
+                    data[i + 7] = bytes[7];
+                }
+
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        private void WriteSamplesPcm64BitConvert(Samples<T> samples)
+        {
+            var converter = new SampleConverter<T, long>();
+
+            if (WritePriority == IoPriority.Memory)
+            {
+                foreach (var sample in samples)
+                {
+                    var bytes = BitConverter.GetBytes(converter.Convert(sample));
+                    stream.Write(bytes, 0, 8);
+                }
+            }
+            else
+            {
+                var data = new byte[samples.Count * 8];
+
+                for (var i = 0; i < data.Length; i += 8)
+                {
+                    var bytes = BitConverter.GetBytes(converter.Convert(samples[i / 8]));
+                    data[i] = bytes[0];
+                    data[i + 1] = bytes[1];
+                    data[i + 2] = bytes[2];
+                    data[i + 3] = bytes[3];
+                    data[i + 4] = bytes[4];
+                    data[i + 5] = bytes[5];
+                    data[i + 6] = bytes[6];
+                    data[i + 7] = bytes[7];
+                }
+
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        private void WriteSamplesIeee64BitNoConvert(Samples<T> samples)
+        {
+            if (WritePriority == IoPriority.Memory)
+            {
+                foreach (var sample in samples)
+                {
+                    var bytes = BitConverter.GetBytes(sample as double? ?? 0);
+                    stream.Write(bytes, 0, 8);
+                }
+            }
+            else
+            {
+                var data = new byte[samples.Count * 8];
+
+                for (var i = 0; i < data.Length; i += 8)
+                {
+                    var bytes = BitConverter.GetBytes(samples[i / 8] as double? ?? 0);
+                    data[i] = bytes[0];
+                    data[i + 1] = bytes[1];
+                    data[i + 2] = bytes[2];
+                    data[i + 3] = bytes[3];
+                    data[i + 4] = bytes[4];
+                    data[i + 5] = bytes[5];
+                    data[i + 6] = bytes[6];
+                    data[i + 7] = bytes[7];
+                }
+
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        private void WriteSamplesIeee64BitConvert(Samples<T> samples)
+        {
+            var converter = new SampleConverter<T, double>();
+
+            if (WritePriority == IoPriority.Memory)
+            {
+                foreach (var sample in samples)
+                {
+                    var bytes = BitConverter.GetBytes(converter.Convert(sample));
+                    stream.Write(bytes, 0, 8);
+                }
+            }
+            else
+            {
+                var data = new byte[samples.Count * 8];
+
+                for (var i = 0; i < data.Length; i += 8)
+                {
+                    var bytes = BitConverter.GetBytes(converter.Convert(samples[i / 8]));
+                    data[i] = bytes[0];
+                    data[i + 1] = bytes[1];
+                    data[i + 2] = bytes[2];
+                    data[i + 3] = bytes[3];
+                    data[i + 4] = bytes[4];
+                    data[i + 5] = bytes[5];
+                    data[i + 6] = bytes[6];
+                    data[i + 7] = bytes[7];
+                }
+
+                stream.Write(data, 0, data.Length);
+            }
+        }
+
+        # endregion
+
         private uint GetSpeakerMask()
         {
             uint mask = 0;
@@ -1032,7 +1083,7 @@ namespace WavDotNet.Core
                     totalSampleCount = k;
                 }
             }
-            
+
             totalSampleCount *= AudioData.Count;
 
             for (var i = 0; i < totalSampleCount; i += AudioData.Count) // Jump every frame.
@@ -1052,20 +1103,13 @@ namespace WavDotNet.Core
 
             foreach (var ch in AudioData)
             {
-                if (sorted.Count == 0)
+                if (ch.Position > AudioData[0].Position || sorted.Count == 0)
                 {
                     sorted.Add(ch.Samples);
                 }
                 else
                 {
-                    if (ch.Position > AudioData[0].Position)
-                    {
-                        sorted.Add(ch.Samples);
-                    }
-                    else
-                    {
-                        sorted.Insert(0, ch.Samples);
-                    }
+                    sorted.Insert(0, ch.Samples);
                 }
             }
 

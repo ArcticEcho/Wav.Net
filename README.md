@@ -10,7 +10,7 @@ Audio support:
  - Audio format: PCM and IEEE floating-point,
  - Supports `Stream`s? Yes,
  - Max channels: 19,
- - Max file size: 2GiB.
+ - Max file/`Stream` size: 2GiB.
 
 Current features:
 

@@ -30,19 +30,13 @@ namespace WavDotNet.Core
     /// <summary>
     /// Represents a class for dynamically reading samples of a single channel from a Stream or file.
     /// </summary>
-    /// <typeparam name="T">The type of the samples to be returned (when read). (Samples are automatically converted to type T if they are not already of that type.)</typeparam>
-    public class SampleReader<T> : IDisposable, IEnumerable<T>
+    /// <typeparam name="T">The type of the samples to be returned (when read). (Samples are automatically normalised if necessary.)</typeparam>
+    public class SampleReader<T> : WavMeta, IDisposable, IEnumerable<T>
     {
         private bool disposed;
-        private ushort bitDepth;
-        private ushort channels;
-        private uint headerSize;
-        private uint speakerMask;
-        private uint audioLengthBytes;
-        private WavFormat audioFormat;
-        private readonly Stream stream;
-        private readonly Dictionary<uint, T> buffer;
-        private readonly uint bufferCapacity;
+        private Stream stream;
+        private Dictionary<uint, T> buffer;
+        private uint bufferCapacity;
 
         /// <summary>
         /// The default size of the internal buffer (used to increase reading performance). Currently set to 1 MiB.
@@ -50,20 +44,36 @@ namespace WavDotNet.Core
         public const uint DefaultBufferSize = 1048576;
 
         /// <summary>
-        /// The channel of the file/stream to read from.
+        /// The smallest permitted size for the internal buffer. Currently set to 4 KiB.
         /// </summary>
-        public ChannelPositions Channel { get; private set; }
+        public const uint MinimumBufferSize = 4096;
 
         /// <summary>
-        /// The total number of samples in the file/Stream.
+        /// The duration (as a TimeSpan) of the audio.
+        /// </summary>
+        public TimeSpan Duration
+        {
+            get
+            {
+                return TimeSpan.FromSeconds(SampleCount / (double)SampleRate);
+            }
+        }
+
+        /// <summary>
+        /// The total number of samples in this channel.
         /// </summary>
         public uint SampleCount 
         {
             get
             {
-                return (uint)(audioLengthBytes / channels / (bitDepth / 8));
+                return (uint)(AudioLengthBytes / Channels / BitDepth / 8);
             }
         }
+
+        /// <summary>
+        /// The channel of the file/Stream to read from.
+        /// </summary>
+        public ChannelPositions Channel { get; private set; }
 
         /// <summary>
         /// Returns a sample at the specified index.
@@ -127,72 +137,40 @@ namespace WavDotNet.Core
 
         # region Constructors/destructor.
 
+        public SampleReader(string filePath, ChannelPositions channel, uint internalBufferCapacity, WavMeta metaData)
+        {
+            var ex = InitialiseFromFile(filePath, channel, internalBufferCapacity);
+            if (ex != null) { throw ex; }
+        }
+
         public SampleReader(string filePath, ChannelPositions channel, uint internalBufferCapacity)
         {
-            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
-            if (!File.Exists(filePath)) { throw new FileNotFoundException(); }
-            if (new FileInfo(filePath).Length > int.MaxValue) { throw new ArgumentException("File is too large. Must be less than 2 GiB.", "filePath"); }
-            if (internalBufferCapacity < 1024) { throw new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024."); }
-
-            stream = File.OpenRead(filePath);
-            Channel = channel;
-
-            GetMeta();
-            CheckMeta();
-
-            this.bufferCapacity = (uint)internalBufferCapacity;
-            buffer = new Dictionary<uint, T>();
-            UpdateBuffer(0);
+            var ex = InitialiseFromFile(filePath, channel, internalBufferCapacity);
+            if (ex != null) { throw ex; }
         }
 
         public SampleReader(string filePath, ChannelPositions channel)
         {
-            if (String.IsNullOrEmpty(filePath)) { throw new ArgumentException("Can not be null or empty.", "filePath"); }
-            if (!File.Exists(filePath)) { throw new FileNotFoundException(); }
-            if (new FileInfo(filePath).Length > int.MaxValue) { throw new ArgumentException("File is too large. Must be less than 2 GiB.", "filePath"); }
+            var ex = InitialiseFromFile(filePath, channel, DefaultBufferSize);
+            if (ex != null) { throw ex; }
+        }
 
-            stream = File.OpenRead(filePath);
-            Channel = channel;
-
-            GetMeta();
-            CheckMeta();
-
-            bufferCapacity = DefaultBufferSize;
-            buffer = new Dictionary<uint, T>();
-            UpdateBuffer(0);
+        public SampleReader(Stream stream, ChannelPositions channel, uint internalBufferCapacity, WavMeta metaData)
+        {
+            var ex = InitialiseFromStream(stream, channel, internalBufferCapacity, metaData);
+            if (ex != null) { throw ex; }
         }
 
         public SampleReader(Stream stream, ChannelPositions channel, uint internalBufferCapacity)
         {
-            if (stream == null) { throw new ArgumentNullException("stream"); }
-            if (stream.Length > int.MaxValue) { throw new ArgumentException("Stream is too large. Must be less than 2GiB.", "stream"); }
-            if (internalBufferCapacity < 1024) { throw new ArgumentOutOfRangeException("bufferCapacity", "Must be more than 1024."); }
-
-            this.stream = stream;
-            Channel = channel;
-
-            GetMeta();
-            CheckMeta();
-
-            this.bufferCapacity = (uint)internalBufferCapacity;
-            buffer = new Dictionary<uint, T>();
-            UpdateBuffer(0);
+            var ex = InitialiseFromStream(stream, channel, internalBufferCapacity);
+            if (ex != null) { throw ex; }
         }
 
         public SampleReader(Stream stream, ChannelPositions channel)
         {
-            if (stream == null) { throw new ArgumentNullException("stream"); }
-            if (stream.Length > int.MaxValue) { throw new ArgumentException("Stream is too large. Must be less than 2GiB.", "stream"); }
-
-            this.stream = stream;
-            Channel = channel;
-
-            GetMeta();
-            CheckMeta();
-
-            bufferCapacity = DefaultBufferSize;
-            buffer = new Dictionary<uint, T>();
-            UpdateBuffer(0);
+            var ex = InitialiseFromStream(stream, channel, DefaultBufferSize);
+            if (ex != null) { throw ex; }
         }
 
         ~SampleReader()
@@ -205,6 +183,9 @@ namespace WavDotNet.Core
 
         # endregion
 
+
+
+        # region Public methods/enumulator.
 
         /// <summary>
         /// Returns all samples from the stream/file.
@@ -219,8 +200,8 @@ namespace WavDotNet.Core
         /// </summary>
         public Samples<T> LoadSamples(uint startIndex, uint endIndex)
         {
-            if (endIndex == 0) { throw new ArgumentOutOfRangeException("endIndex", "endIndex must be more than 0."); }
-            if (startIndex > endIndex) { throw new ArgumentOutOfRangeException("startIndex", "startIndex must be less than endIndex."); }
+            if (endIndex == 0) { throw new ArgumentOutOfRangeException("endIndex", "'endIndex' must be more than 0."); }
+            if (startIndex > endIndex) { throw new ArgumentOutOfRangeException("startIndex", "'startIndex' must be less than endIndex."); }
 
             return ReadAudioData(startIndex, endIndex);
         }
@@ -247,13 +228,15 @@ namespace WavDotNet.Core
             return GetEnumerator();
         }
 
+        # endregion
+
 
 
         private void UpdateBuffer(uint sampleIndex)
         {
             buffer.Clear();
 
-            var trueByteDepth = (audioFormat == WavFormat.FloatingPoint ? Math.Max((ushort)32, bitDepth) : bitDepth) / 8;
+            var trueByteDepth = (Format == WavFormat.FloatingPoint ? Math.Max((ushort)32, BitDepth) : BitDepth) / 8;
             var endIndex = Math.Min((uint)(bufferCapacity / trueByteDepth) + sampleIndex, SampleCount);
             var samples = LoadSamples(sampleIndex, endIndex);
 
@@ -263,7 +246,49 @@ namespace WavDotNet.Core
             }
         }
 
-        # region Private meta reading methods.
+        # region Private meta reading/initialisation methods.
+
+        private Exception InitialiseFromFile(string filePath, ChannelPositions channel, uint internalBufferCapacity, WavMeta metaData = null)
+        {
+            if (String.IsNullOrEmpty(filePath)) { return new ArgumentException("Must not be null or empty.", "filePath"); }
+            if (!File.Exists(filePath)) { return new FileNotFoundException(); }
+            if (new FileInfo(filePath).Length > int.MaxValue) { return new ArgumentException("File is too large. Must be less than 2 GiB.", "filePath"); }
+            if (internalBufferCapacity < MinimumBufferSize) { return new ArgumentOutOfRangeException("bufferCapacity", "Must be more than " + MinimumBufferSize + " bytes."); }
+
+            stream = File.OpenRead(filePath);
+            Channel = channel;
+
+            if (metaData == null) { GetMeta(); }
+            var ex = CheckMeta();
+            if (ex != null) { return ex; }
+
+            this.bufferCapacity = (uint)internalBufferCapacity;
+            buffer = new Dictionary<uint, T>();
+            UpdateBuffer(0);
+            
+            return null;
+        }
+        
+        private Exception InitialiseFromStream(Stream stream, ChannelPositions channel, uint internalBufferCapacity, WavMeta metaData = null)
+        {
+            if (stream == null) { return new ArgumentNullException("stream"); }
+            if (!stream.CanRead) { return new NotSupportedException("'stream' must be readable."); }
+            if (stream.Length > int.MaxValue) { return new ArgumentException("Stream is too large. Must be less than 2GiB.", "stream"); }
+            if (internalBufferCapacity < MinimumBufferSize) { return new ArgumentOutOfRangeException("bufferCapacity", "Must be more than " + MinimumBufferSize + " bytes."); }
+
+            this.stream = stream;
+            Channel = channel;
+
+            if (metaData == null) { GetMeta(); }
+            var ex = CheckMeta();
+            if (ex != null) { return ex; }
+
+            this.bufferCapacity = (uint)internalBufferCapacity;
+            buffer = new Dictionary<uint, T>();
+            UpdateBuffer(0);
+
+            return null;
+        }
 
         private void GetMeta()
         {
@@ -281,33 +306,42 @@ namespace WavDotNet.Core
             }
 
             var fmtStartIndex = header.IndexOf("fmt ", 0, StringComparison.Ordinal) + 4;
-            headerSize = (uint)header.IndexOf("data", 0, StringComparison.Ordinal) + 8;
-            audioLengthBytes = (uint)streamLength - headerSize;
-            audioFormat = (WavFormat)BitConverter.ToUInt16(bytes, fmtStartIndex + 4);
-            channels = BitConverter.ToUInt16(bytes, fmtStartIndex + 6);
-            bitDepth = BitConverter.ToUInt16(bytes, fmtStartIndex + 18);
+            HeaderSize = (uint)header.IndexOf("data", 0, StringComparison.Ordinal) + 8;
+            AudioLengthBytes = (uint)streamLength - HeaderSize;
+            Format = (WavFormat)BitConverter.ToUInt16(bytes, fmtStartIndex + 4);
+            Channels = BitConverter.ToUInt16(bytes, fmtStartIndex + 6);
+            BitDepth = BitConverter.ToUInt16(bytes, fmtStartIndex + 18);
 
-            if ((int)audioFormat == 65534)
+            if ((int)Format == 65534)
             {
-                speakerMask = BitConverter.ToUInt32(bytes, 40);
-                audioFormat = (WavFormat)bytes[fmtStartIndex + 28 + 3];
+                SpeakerMask = BitConverter.ToUInt32(bytes, 40);
+                Format = (WavFormat)bytes[fmtStartIndex + 28 + 3];
             }
             else
             {
                 // If the speaker mask is not present, then assume 2 channels = FL + FR, otherwise call GetSpeakerMask.
-                speakerMask = channels == 2 ? 3 : GetSpeakerMask(channels);
+                SpeakerMask = Channels == 2 ? 3 : GetSpeakerMask(Channels);
             }
         }
 
-        private void CheckMeta()
+        private Exception CheckMeta()
         {
-            if (bitDepth == 0) { throw new UnrecognisedWavFileException("File is displaying an invalid bit depth."); }
-            if (channels == 0) { throw new UnrecognisedWavFileException("File is displaying an invalid number of channels."); }
-            if (audioFormat == WavFormat.Unknown) { throw new UnrecognisedWavFileException("Can only read audio in either PCM or IEEE format."); }
-            if (bitDepth != 8 && bitDepth != 16 && bitDepth != 24 && bitDepth != 32 && bitDepth != 64 && bitDepth != 128)
+            if (BitDepth == 0) { return new UnrecognisedWavFileException("File is displaying an invalid bit depth."); }
+            if (Channels == 0) { return new UnrecognisedWavFileException("File is displaying an invalid number of channels."); }
+            if (Format == WavFormat.Unknown) { return new UnrecognisedWavFileException("Can only read audio in either PCM or IEEE format."); }
+            if (BitDepth != 8 && BitDepth != 16 && BitDepth != 24 && BitDepth != 32 && BitDepth != 64)
             {
-                throw new UnrecognisedWavFileException("File is of an unsupported bit depth of:" + bitDepth + ".\nSupported bit depths: 8, 16, 24, 32 & 64.");
+                return new UnrecognisedWavFileException("File is of an unsupported bit depth of:" + BitDepth + ".\nSupported bit depths: 8, 16, 24, 32 & 64.");
             }
+            var contains = false;
+            var chns = FindExistingChannels(SpeakerMask);
+            foreach (var ch in chns)
+            {
+                if (ch == Channel) { contains = true; break; }
+            }
+            if (!contains) { return new KeyNotFoundException("Stream/file does not contain channel: " + Channel.ToString() + "."); }
+            
+            return null;
         }
 
         private static uint GetSpeakerMask(int channelCount)
@@ -343,7 +377,7 @@ namespace WavDotNet.Core
 
         private Samples<T> ReadAudioData(uint startIndex, uint endIndex)
         {
-            switch (bitDepth)
+            switch (BitDepth)
             {
                 case 8:
                 {
@@ -372,7 +406,7 @@ namespace WavDotNet.Core
 
                 default:
                 {
-                    throw new NotSupportedException("Can not read audio at bit depth of: " + bitDepth);
+                    throw new NotSupportedException("Cannot read audio at bit depth of: " + BitDepth);
                 }
             }
         }
@@ -390,9 +424,9 @@ namespace WavDotNet.Core
 
             Marshal.FreeHGlobal((IntPtr)bytes);
 
-            var realSamples = new SampleConverter<byte, T>().Convert(samples);
+            var reqSams = new SampleConverter<byte, T>().Convert(samples);
 
-            return new Samples<T>(realSamples);
+            return new Samples<T>(reqSams);
         }
 
         private unsafe Samples<T> Read16BitSamples(uint sampleStartIndex, uint sampleEndIndex)
@@ -444,7 +478,7 @@ namespace WavDotNet.Core
 
             Marshal.FreeHGlobal((IntPtr)bytes);
 
-            if (audioFormat == WavFormat.FloatingPoint)
+            if (Format == WavFormat.FloatingPoint)
             {
                 var floatSamples = new float[intSamples.Length];
 
@@ -480,7 +514,7 @@ namespace WavDotNet.Core
 
             Marshal.FreeHGlobal((IntPtr)bytes);
 
-            if (audioFormat == WavFormat.FloatingPoint)
+            if (Format == WavFormat.FloatingPoint)
             {
                 var doubleSamples = new double[longSamples.Length];
 
@@ -509,18 +543,18 @@ namespace WavDotNet.Core
 
         private unsafe byte* ReadBytes(uint sampleStartIndex, uint sampleEndIndex, out int byteCount)
         {
-            var chNo = GetChannelNumber(Channel, FindExistingChannels(speakerMask));
-            var byteDepth = bitDepth / 8;
+            var chNo = GetChannelNumber(Channel, FindExistingChannels(SpeakerMask));
+            var byteDepth = BitDepth / 8;
             var chDelta = chNo * byteDepth;
-            var frameSize = byteDepth * channels;
-            var startDelta = (int)(sampleStartIndex * byteDepth * channels);
-            var endDelta = (int)(sampleEndIndex * byteDepth * channels);
+            var frameSize = byteDepth * Channels;
+            var startDelta = (int)(sampleStartIndex * byteDepth * Channels);
+            var endDelta = (int)(sampleEndIndex * byteDepth * Channels);
             var outputBytesCount = endDelta - startDelta;
             var temp = new byte[outputBytesCount];
             var ptr = (byte*)Marshal.AllocHGlobal(outputBytesCount);
             var i = 0;
 
-            stream.Position = headerSize + startDelta;
+            stream.Position = HeaderSize + startDelta;
             stream.Read(temp, 0, outputBytesCount);
 
             startDelta += chDelta;

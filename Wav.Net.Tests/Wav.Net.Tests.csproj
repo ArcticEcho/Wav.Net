@@ -43,7 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnitTesting\TestMath.cs" />
+    <Compile Include="UnitTesting\SamplesTests.cs" />
+    <Compile Include="UnitTesting\MathTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Wav.Net\Wav.Net.csproj">

@@ -54,9 +54,9 @@
     <Compile Include="Core\SampleConverter.cs" />
     <Compile Include="Core\SampleReader.cs" />
     <Compile Include="Core\Samples.cs" />
-    <Compile Include="Core\WavFile.cs" />
-    <Compile Include="Core\WavFileRead.cs" />
-    <Compile Include="Core\WavFileWrite.cs" />
+    <Compile Include="Core\WavMeta.cs" />
+    <Compile Include="Core\WavRead.cs" />
+    <Compile Include="Core\WavWrite.cs" />
     <Compile Include="Core\WavFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\Amplifier.cs" />

@@ -7,7 +7,7 @@ using WavMath = WavDotNet.Tools.Math;
 namespace WavDotNet.Tests.UnitTesting
 {
     [TestClass]
-    public class TestMath
+    public class MathTests
     {
         [TestMethod]
         public void TestToDecibels()

@@ -29,19 +29,24 @@ namespace WavDotNet.Core
 
 
 
-        public TOut[] Convert(IEnumerable<TIn> samples)
+        public TOut[] Convert(TIn[] samples)
         {
             if (samples == null) { throw new ArgumentNullException("samples"); }
 
-            var algo = manager.GetAlgo();
-            var converted = new List<TOut>();
-
-            foreach (var sample in samples)
+            if (typeof(TIn) == typeof(TOut))
             {
-                converted.Add(algo(sample));
+                return (TOut[])System.Convert.ChangeType(samples, typeof(TOut));
             }
 
-            return converted.ToArray();
+            var algo = manager.GetAlgo();
+            var converted = new TOut[samples.LongLength];
+
+            for (var i = 0L; i < converted.LongLength; i++)
+            {
+                converted[i] = algo(samples[i]);
+            }
+
+            return converted;
         }
 
         public TOut Convert(TIn sample)
