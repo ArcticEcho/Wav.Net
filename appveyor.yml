@@ -1,4 +1,4 @@
-version: 1.0.0.{build}
+version: 1.0.{build}.0
 
 configuration: Release
 
@@ -12,12 +12,17 @@ assembly_info:
   assembly_informational_version: '1.0.0-beta'
 
 build:
-  project: Wav.Net.sln
+  project: ./Wav.Net/Wav.Net.sln
   parallel: true
   verbosity: minimal
 
 after_build:
 - ps: .\NuGet\pack.ps1
+
+artifacts:
+- path: Wav.Net\bin\Release\Wav.Net.dll
+  name: Wav.Net.dll
+- path: '**\Wav.Net*.nupkg'
   
 deploy:
 - provider: NuGet
