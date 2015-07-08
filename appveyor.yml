@@ -11,9 +11,6 @@ assembly_info:
   assembly_file_version: '{version}'
   assembly_informational_version: '1.0.0-beta'
 
-before_build:
-- nuget restore
-
 build:
   project: Wav.Net.sln
   parallel: true
