@@ -1,3 +1,0 @@
-language: csharp
-solution: ./Wav.Net/Wav.Net.sln
-script: xbuild /p:Configuration=Release ./Wav.Net/Wav.Net.csproj

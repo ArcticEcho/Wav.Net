@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>Wav.Net</id>
+        <version>1.0.0-beta</version>
+        <title>Wav.Net</title>
+        <authors>Samuel Kamber</authors>
+        <owners>Samuel Kamber</owners>
+        <licenseUrl>https://www.gnu.org/licenses/gpl-3.0.html</licenseUrl>
+        <projectUrl>https://github.com/ArcticEcho/Wav.Net</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A .Net 2.0 library for transcoding wav files. (Supports Mono.)</description>
+        <summary>A .Net 2.0 library for transcoding wav files. (Supports Mono.)</summary>
+        <releaseNotes />
+        <language>en-GB</language>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="System" targetFramework=".NETFramework2.0" />
+        </frameworkAssemblies>
+    </metadata>
+    <files>
+        <file src="..\Wav.Net\bin\Release\Wav.Net.dll" target="lib\Wav.Net.dll" />
+    </files>
+</package>
