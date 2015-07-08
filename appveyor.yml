@@ -16,7 +16,7 @@ build:
   parallel: true
   verbosity: minimal
 
-after_build:
+after_tests:
 - ps: .\NuGet\pack.ps1
 
 artifacts:
