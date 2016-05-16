@@ -10,7 +10,7 @@ Audio support:
  - Audio format: PCM and IEEE floating-point,
  - Supports `Stream`s? Yes,
  - Max channels: 19,
- - Max file/`Stream` size: 2GiB.
+ - Max file/`Stream` size: 2GiB.<sup>*</sup>
 
 Current features:
 
@@ -25,6 +25,8 @@ Current features:
 ---
 
  <sup>§ *Requires .Net 2.0 or higher, and yes, it's Mono compatible.*</sup>
+ 
+ <sup>* *If we're using a `Stream`, why are we still limited?*</sup>
 
  [sineGen]: https://github.com/ArcticEcho/Wav.Net/blob/master/Wav.Net/Tools/Generators/SineWave.cs#L34
  [sawGen]: https://github.com/ArcticEcho/Wav.Net/blob/master/Wav.Net/Tools/Generators/Sawtooth.cs#L32
